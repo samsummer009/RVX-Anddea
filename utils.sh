@@ -143,13 +143,21 @@ get_rv_prebuilts() {
 				if ! (
 					mkdir -p "${file}-zip" || return 1
 					unzip -qo "${file}" -d "${file}-zip" || return 1
+					if [ ! -f "${file}-zip/extensions/shared.rve" ]; then
+						echo >&2 "Warning: shared.rve not found in patches bundle, skipping integrations patch"
+						return 0
+					fi
+					if [ ! -f "${BIN_DIR}/paccer.jar" ] || [ ! -f "${BIN_DIR}/dexlib2.jar" ]; then
+						echo >&2 "Warning: Required jar files not found, skipping integrations patch"
+						return 0
+					fi
 					java -cp "${BIN_DIR}/paccer.jar:${BIN_DIR}/dexlib2.jar" com.jhc.Main "${file}-zip/extensions/shared.rve" "${file}-zip/extensions/shared-patched.rve" || return 1
 					mv -f "${file}-zip/extensions/shared-patched.rve" "${file}-zip/extensions/shared.rve" || return 1
 					rm "${file}" || return 1
 					cd "${file}-zip" || abort
 					zip -0rq "${CWD}/${file}" . || return 1
 				) >&2; then
-					echo >&2 "Patching revanced-integrations failed"
+					echo >&2 "Warning: Patching revanced-integrations failed, continuing without patch"
 				fi
 				rm -r "${file}-zip" || :
 			fi
@@ -170,6 +178,16 @@ set_prebuilts() {
 	else
 		HTMLQ="${BIN_DIR}/htmlq/htmlq-x86_64"
 		TOML="${BIN_DIR}/toml/tq-x86_64"
+	fi
+
+	# Download required jar files if they don't exist
+	if [ ! -f "${BIN_DIR}/paccer.jar" ]; then
+		pr "Downloading paccer.jar"
+		gh_dl "${BIN_DIR}/paccer.jar" "https://github.com/j-hc/paccer/releases/latest/download/paccer.jar"
+	fi
+	if [ ! -f "${BIN_DIR}/dexlib2.jar" ]; then
+		pr "Downloading dexlib2.jar"
+		gh_dl "${BIN_DIR}/dexlib2.jar" "https://github.com/j-hc/dexlib2/releases/latest/download/dexlib2.jar"
 	fi
 }
 
