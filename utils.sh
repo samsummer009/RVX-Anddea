@@ -77,20 +77,16 @@ get_rv_prebuilts() {
 		local url file tag_name name
 		file=$(find "$dir" -name "${fprefix}-${name_ver#v}.${ext}" -type f 2>/dev/null)
 		if [ -z "$file" ]; then
-			# Try to find any existing file with the same prefix
-			local existing_file=$(find "$dir" -name "${fprefix}-*.${ext}" | head -1)
-			if [ -n "$existing_file" ]; then
-				local existing_ver=$(basename "$existing_file" | sed "s/${fprefix}-\(.*\).${ext}/\1/")
-				if [ "$ver" = "latest" ] || [ "$existing_ver" = "${ver#v}" ]; then
-					pr "Found matching ${tag} file, reusing it"
-					file="$existing_file"
-					tag_name=$(cut -d'-' -f3- <<<"$(basename "$file")")
-					tag_name=v${tag_name%.*}
-				else
-					pr "Found different version ($existing_ver), downloading new version"
-					rm -f "$existing_file"
-				fi
-			fi
+			local resp asset name
+			resp=$(gh_req "$rv_rel" -) || return 1
+			if [ "$ver" = "dev" ]; then resp=$(jq -r '.[0]' <<<"$resp"); fi
+			tag_name=$(jq -r '.tag_name' <<<"$resp")
+			asset=$(jq -e -r ".assets[] | select(.name | endswith(\"$ext\"))" <<<"$resp") || return 1
+			url=$(jq -r .url <<<"$asset")
+			name=$(jq -r .name <<<"$asset")
+			file="${dir}/${name}"
+			gh_dl "$file" "$url" >&2 || return 1
+			echo "$tag: $(cut -d/ -f1 <<<"$src")/${name}  " >>"${cl_dir}/changelog.md"
 		else
 			grab_cl=false
 			local for_err=$file
@@ -102,32 +98,24 @@ get_rv_prebuilts() {
 			tag_name=$(cut -d'-' -f3- <<<"$name")
 			tag_name=v${tag_name%.*}
 		fi
-
-		if [ -z "$file" ]; then
-			local resp asset name
-			resp=$(gh_req "$rv_rel" -) || return 1
-			if [ "$ver" = "dev" ]; then resp=$(jq -r '.[0]' <<<"$resp"); fi
-			tag_name=$(jq -r '.tag_name' <<<"$resp")
-			asset=$(jq -e -r ".assets[] | select(.name | endswith(\"$ext\"))" <<<"$resp") || return 1
-			url=$(jq -r .url <<<"$asset")
-			name=$(jq -r .name <<<"$asset")
-			file="${dir}/${name}"
-			gh_dl "$file" "$url" >&2 || return 1
-			echo "$tag: $(cut -d/ -f1 <<<"$src")/${name}  " >>"${cl_dir}/changelog.md"
-		fi
 		if [ "$tag" = "Patches" ]; then
 			if [ $grab_cl = true ]; then echo -e "[Changelog](https://github.com/${src}/releases/tag/${tag_name})\n" >>"${cl_dir}/changelog.md"; fi
 			if [ "$REMOVE_RV_INTEGRATIONS_CHECKS" = true ]; then
 				if ! (
 					mkdir -p "${file}-zip" || return 1
 					unzip -qo "${file}" -d "${file}-zip" || return 1
+					if [ ! -f "${file}-zip/extensions/shared.rve" ]; then
+						epr "shared.rve not found in ${file}"
+						return 1
+					fi
 					java -cp "${BIN_DIR}/paccer.jar:${BIN_DIR}/dexlib2.jar" com.jhc.Main "${file}-zip/extensions/shared.rve" "${file}-zip/extensions/shared-patched.rve" || return 1
 					mv -f "${file}-zip/extensions/shared-patched.rve" "${file}-zip/extensions/shared.rve" || return 1
 					rm "${file}" || return 1
 					cd "${file}-zip" || abort
 					zip -0rq "${CWD}/${file}" . || return 1
 				) >&2; then
-					echo >&2 "Patching revanced-integrations failed"
+					epr "Patching revanced-integrations failed"
+					return 1
 				fi
 				rm -r "${file}-zip" || :
 			fi
