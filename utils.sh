@@ -560,20 +560,10 @@ build_rv() {
 	# Check if we already have the required version downloaded
 	if [ -f "$stock_apk" ]; then
 		pr "Using existing APK for version ${version}"
-	else
-		# Try to find any existing APK with the same package name and architecture
-		local existing_apk=$(find "$TEMP_DIR" -name "${pkg_name}-*${arch_f}.apk" | head -1)
-		if [ -n "$existing_apk" ]; then
-			local existing_version=$(basename "$existing_apk" | sed "s/${pkg_name}-\(.*\)${arch_f}.apk/\1/")
-			if [ "$existing_version" = "$version_f" ]; then
-				pr "Found matching APK, reusing it"
-				cp "$existing_apk" "$stock_apk"
-			else
-				pr "Found different version ($existing_version), downloading new version"
-				rm -f "$existing_apk"
-			fi
-		fi
 	fi
+
+	# We're skipping the code that tries to reuse existing APKs
+	# This ensures we always download a fresh copy
 
 	if [ ! -f "$stock_apk" ]; then
 		for dl_p in archive apkmirror uptodown; do
