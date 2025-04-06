@@ -555,17 +555,8 @@ build_rv() {
 	pr "Choosing version '${version}' for ${table}"
 	local version_f=${version// /}
 	version_f=${version_f#v}
-	local stock_apk="${TEMP_DIR}/${pkg_name}-${version_f}${arch_f}.apk"
-	
-	# Check if we already have the required version downloaded
-	if [ -f "$stock_apk" ]; then
-		pr "Using existing APK for version ${version}"
-	fi
-
-	# We're skipping the code that tries to reuse existing APKs
-	# This ensures we always download a fresh copy
-
-	if [ ! -f "$stock_apk" ]; then
+	local stock_apk="${TEMP_DIR}/${pkg_name}-${version_f}-${arch_f}.apk"
+		if [ ! -f "$stock_apk" ]; then
 		for dl_p in archive apkmirror uptodown; do
 			if [ -z "${args[${dl_p}_dlurl]}" ]; then continue; fi
 			pr "Downloading '${table}' from ${dl_p}"
