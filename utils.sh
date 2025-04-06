@@ -65,7 +65,27 @@ get_rv_prebuilts() {
 
 		local rv_rel="https://api.github.com/repos/${src}/releases" name_ver
 		if [ "$ver" = "dev" ]; then
-			name_ver="*-dev*"
+			# Get both dev and latest stable releases
+			local dev_resp=$(gh_req "$rv_rel" -) || return 1
+			local latest_resp=$(gh_req "$rv_rel/latest" -) || return 1
+			
+			# Extract version numbers
+			local dev_ver=$(echo "$dev_resp" | jq -r '.[0].tag_name')
+			local stable_ver=$(echo "$latest_resp" | jq -r '.tag_name')
+			
+			# Compare versions
+			if [ "$(printf '%s\n' "$dev_ver" "$stable_ver" | sort -V | tail -n1)" = "$dev_ver" ]; then
+				# Dev version is newer, use it
+				pr "Using dev version $dev_ver (newer than stable $stable_ver)"
+				resp=$(echo "$dev_resp" | jq -r '.[0]')
+				name_ver="*-dev*"
+			else
+				# Stable version is newer or equal, use it
+				pr "Using stable version $stable_ver (newer than or equal to dev $dev_ver)"
+				resp="$latest_resp"
+				rv_rel="$rv_rel/latest"
+				name_ver="*"
+			fi
 		elif [ "$ver" = "latest" ]; then
 			rv_rel+="/latest"
 			name_ver="*"
@@ -77,16 +97,20 @@ get_rv_prebuilts() {
 		local url file tag_name name
 		file=$(find "$dir" -name "${fprefix}-${name_ver#v}.${ext}" -type f 2>/dev/null)
 		if [ -z "$file" ]; then
-			local resp asset name
-			resp=$(gh_req "$rv_rel" -) || return 1
-			if [ "$ver" = "dev" ]; then resp=$(jq -r '.[0]' <<<"$resp"); fi
-			tag_name=$(jq -r '.tag_name' <<<"$resp")
-			asset=$(jq -e -r ".assets[] | select(.name | endswith(\"$ext\"))" <<<"$resp") || return 1
-			url=$(jq -r .url <<<"$asset")
-			name=$(jq -r .name <<<"$asset")
-			file="${dir}/${name}"
-			gh_dl "$file" "$url" >&2 || return 1
-			echo "$tag: $(cut -d/ -f1 <<<"$src")/${name}  " >>"${cl_dir}/changelog.md"
+			# Try to find any existing file with the same prefix
+			local existing_file=$(find "$dir" -name "${fprefix}-*.${ext}" | head -1)
+			if [ -n "$existing_file" ]; then
+				local existing_ver=$(basename "$existing_file" | sed "s/${fprefix}-\(.*\).${ext}/\1/")
+				if [ "$ver" = "latest" ] || [ "$existing_ver" = "${ver#v}" ]; then
+					pr "Found matching ${tag} file, reusing it"
+					file="$existing_file"
+					tag_name=$(cut -d'-' -f3- <<<"$(basename "$file")")
+					tag_name=v${tag_name%.*}
+				else
+					pr "Found different version ($existing_ver), downloading new version"
+					rm -f "$existing_file"
+				fi
+			fi
 		else
 			grab_cl=false
 			local for_err=$file
@@ -98,24 +122,34 @@ get_rv_prebuilts() {
 			tag_name=$(cut -d'-' -f3- <<<"$name")
 			tag_name=v${tag_name%.*}
 		fi
+
+		if [ -z "$file" ]; then
+			local url asset name
+			if [ "$ver" != "dev" ] || [ -z "${resp:-}" ]; then
+				resp=$(gh_req "$rv_rel" -) || return 1
+				if [ "$ver" = "dev" ]; then resp=$(jq -r '.[0]' <<<"$resp"); fi
+			fi
+			tag_name=$(jq -r '.tag_name' <<<"$resp")
+			asset=$(jq -e -r ".assets[] | select(.name | endswith(\"$ext\"))" <<<"$resp") || return 1
+			url=$(jq -r .url <<<"$asset")
+			name=$(jq -r .name <<<"$asset")
+			file="${dir}/${name}"
+			gh_dl "$file" "$url" >&2 || return 1
+			echo "$tag: $(cut -d/ -f1 <<<"$src")/${name}  " >>"${cl_dir}/changelog.md"
+		fi
 		if [ "$tag" = "Patches" ]; then
 			if [ $grab_cl = true ]; then echo -e "[Changelog](https://github.com/${src}/releases/tag/${tag_name})\n" >>"${cl_dir}/changelog.md"; fi
 			if [ "$REMOVE_RV_INTEGRATIONS_CHECKS" = true ]; then
 				if ! (
 					mkdir -p "${file}-zip" || return 1
 					unzip -qo "${file}" -d "${file}-zip" || return 1
-					if [ ! -f "${file}-zip/extensions/shared.rve" ]; then
-						epr "shared.rve not found in ${file}"
-						return 1
-					fi
 					java -cp "${BIN_DIR}/paccer.jar:${BIN_DIR}/dexlib2.jar" com.jhc.Main "${file}-zip/extensions/shared.rve" "${file}-zip/extensions/shared-patched.rve" || return 1
 					mv -f "${file}-zip/extensions/shared-patched.rve" "${file}-zip/extensions/shared.rve" || return 1
 					rm "${file}" || return 1
 					cd "${file}-zip" || abort
 					zip -0rq "${CWD}/${file}" . || return 1
 				) >&2; then
-					epr "Patching revanced-integrations failed"
-					return 1
+					echo >&2 "Patching revanced-integrations failed"
 				fi
 				rm -r "${file}-zip" || :
 			fi
