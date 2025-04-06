@@ -16,7 +16,7 @@ rv-brand = "RVX"
 build-mode = "both"
 version = "latest"
 included-patches = "'Visual preferences icons' 'Return YouTube Username' 'Settings for YouTube' 'Custom branding name for YouTube' 'Theme' 'MaterialYou'"
-excluded-patches = "'Custom Shorts action buttons' 'Custom branding icon for YouTube'"
+excluded-patches = "'Custom Shorts action buttons' 'Custom branding icon for YouTube' 'Hide player buttons'"
 patcher-args = "--legacy-options=patch-options.json"
 
 
@@ -36,7 +36,7 @@ rv-brand = "RVX"
 build-mode = "both"
 version = "latest"
 included-patches = "'Visual preferences icons' 'Return YouTube Username' 'Settings for YouTube' 'Custom branding name for YouTube' 'MaterialYou'"
-excluded-patches = "'Custom Shorts action buttons' 'Custom branding icon for YouTube' 'Theme'"
+excluded-patches = "'Custom Shorts action buttons' 'Custom branding icon for YouTube' 'Theme' 'Hide player buttons'"
 patcher-args = "--legacy-options=patch-options.json"
 
 
