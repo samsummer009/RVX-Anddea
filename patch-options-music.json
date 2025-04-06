@@ -1,0 +1,37 @@
+[
+  {
+    "patchName": "Settings for YouTube Music",
+    "options": [
+      {
+        "key": "rvxSettingsLabel",
+        "value": "ReVanced Extended"
+      }
+    ]
+  },
+  {
+    "patchName": "Custom branding name for YouTube Music",
+    "options": [
+      {
+        "key": "appNameNotification",
+        "value": "YT Music RVX"
+      },
+      {
+        "key": "appNameLauncher",
+        "value": "YT Music RVX"
+      }
+    ]
+  },
+  {
+    "patchName": "Dark theme",
+    "options": [
+      {
+        "key": "darkThemeBackgroundColor",
+        "value": "@android:color/black"
+      },
+      {
+        "key": "materialYou",
+        "value": true
+      }
+    ]
+  }
+] 

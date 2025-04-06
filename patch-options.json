@@ -1,0 +1,33 @@
+[
+  {
+    "patchName": "Settings for YouTube",
+    "options": [
+      {
+        "key": "insertPosition",
+        "value": "@string/about_key"
+      },
+      {
+        "key": "rvxSettingsLabel",
+        "value": "ReVanced Extended"
+      }
+    ]
+  },
+  {
+    "patchName": "Theme",
+    "options": [
+      {
+        "key": "darkThemeBackgroundColor",
+        "value": "@android:color/black"
+      }
+    ]
+  },
+  {
+    "patchName": "Custom branding name for YouTube",
+    "options": [
+      {
+        "key": "appName",
+        "value": "YouTube RVX"
+      }
+    ]
+  }
+] 
