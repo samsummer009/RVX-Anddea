@@ -65,27 +65,7 @@ get_rv_prebuilts() {
 
 		local rv_rel="https://api.github.com/repos/${src}/releases" name_ver
 		if [ "$ver" = "dev" ]; then
-			# Get both dev and latest stable releases
-			local dev_resp=$(gh_req "$rv_rel" -) || return 1
-			local latest_resp=$(gh_req "$rv_rel/latest" -) || return 1
-			
-			# Extract version numbers
-			local dev_ver=$(echo "$dev_resp" | jq -r '.[0].tag_name')
-			local stable_ver=$(echo "$latest_resp" | jq -r '.tag_name')
-			
-			# Compare versions
-			if [ "$(printf '%s\n' "$dev_ver" "$stable_ver" | sort -V | tail -n1)" = "$dev_ver" ]; then
-				# Dev version is newer, use it
-				pr "Using dev version $dev_ver (newer than stable $stable_ver)"
-				resp=$(echo "$dev_resp" | jq -r '.[0]')
-				name_ver="*-dev*"
-			else
-				# Stable version is newer or equal, use it
-				pr "Using stable version $stable_ver (newer than or equal to dev $dev_ver)"
-				resp="$latest_resp"
-				rv_rel="$rv_rel/latest"
-				name_ver="*"
-			fi
+			name_ver="*-dev*"
 		elif [ "$ver" = "latest" ]; then
 			rv_rel+="/latest"
 			name_ver="*"
@@ -124,11 +104,9 @@ get_rv_prebuilts() {
 		fi
 
 		if [ -z "$file" ]; then
-			local url asset name
-			if [ "$ver" != "dev" ] || [ -z "${resp:-}" ]; then
-				resp=$(gh_req "$rv_rel" -) || return 1
-				if [ "$ver" = "dev" ]; then resp=$(jq -r '.[0]' <<<"$resp"); fi
-			fi
+			local resp asset name
+			resp=$(gh_req "$rv_rel" -) || return 1
+			if [ "$ver" = "dev" ]; then resp=$(jq -r '.[0]' <<<"$resp"); fi
 			tag_name=$(jq -r '.tag_name' <<<"$resp")
 			asset=$(jq -e -r ".assets[] | select(.name | endswith(\"$ext\"))" <<<"$resp") || return 1
 			url=$(jq -r .url <<<"$asset")
@@ -143,21 +121,13 @@ get_rv_prebuilts() {
 				if ! (
 					mkdir -p "${file}-zip" || return 1
 					unzip -qo "${file}" -d "${file}-zip" || return 1
-					if [ ! -f "${file}-zip/extensions/shared.rve" ]; then
-						echo >&2 "Warning: shared.rve not found in patches bundle, skipping integrations patch"
-						return 0
-					fi
-					if [ ! -f "${BIN_DIR}/paccer.jar" ] || [ ! -f "${BIN_DIR}/dexlib2.jar" ]; then
-						echo >&2 "Warning: Required jar files not found, skipping integrations patch"
-						return 0
-					fi
 					java -cp "${BIN_DIR}/paccer.jar:${BIN_DIR}/dexlib2.jar" com.jhc.Main "${file}-zip/extensions/shared.rve" "${file}-zip/extensions/shared-patched.rve" || return 1
 					mv -f "${file}-zip/extensions/shared-patched.rve" "${file}-zip/extensions/shared.rve" || return 1
 					rm "${file}" || return 1
 					cd "${file}-zip" || abort
 					zip -0rq "${CWD}/${file}" . || return 1
 				) >&2; then
-					echo >&2 "Warning: Patching revanced-integrations failed, continuing without patch"
+					echo >&2 "Patching revanced-integrations failed"
 				fi
 				rm -r "${file}-zip" || :
 			fi
@@ -178,16 +148,6 @@ set_prebuilts() {
 	else
 		HTMLQ="${BIN_DIR}/htmlq/htmlq-x86_64"
 		TOML="${BIN_DIR}/toml/tq-x86_64"
-	fi
-
-	# Download required jar files if they don't exist
-	if [ ! -f "${BIN_DIR}/paccer.jar" ]; then
-		pr "Downloading paccer.jar"
-		gh_dl "${BIN_DIR}/paccer.jar" "https://github.com/j-hc/paccer/releases/latest/download/paccer.jar"
-	fi
-	if [ ! -f "${BIN_DIR}/dexlib2.jar" ]; then
-		pr "Downloading dexlib2.jar"
-		gh_dl "${BIN_DIR}/dexlib2.jar" "https://github.com/j-hc/dexlib2/releases/latest/download/dexlib2.jar"
 	fi
 }
 
