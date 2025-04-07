@@ -487,10 +487,12 @@ build_rv() {
 	local dl_from=${args[dl_from]}
 	local arch=${args[arch]}
 	local arch_f=""
-	if [ "$arch" ]; then
-		arch_f=".${arch// /}"
-	else
-		arch_f=".${arch}"
+	if [ "$arch" ] && [ "$arch" != "all" ]; then
+		if [ "$arch" = "arm-v7a" ]; then
+			arch_f=".armeabi-v7a"
+		else
+			arch_f=".${arch// /}"
+		fi
 	fi
 
 	local p_patcher_args=()
@@ -653,6 +655,11 @@ build_rv() {
 			"${app_name} ${args[rv_brand]} Magisk module" \
 			"https://raw.githubusercontent.com/${GITHUB_REPOSITORY-}/update/${upj}" \
 			"$base_template"
+
+		if [ "$ENABLE_MAGISK_UPDATE" = true ]; then 
+			local updateJson="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/raw/update/update-json/${upj}"
+			echo "updateJson=${updateJson}" >>"${base_template}/module.prop"
+		fi
 
 		if [[ "$table" == *"YouTube-Music"* ]]; then
 			local module_output="${app_name}-RVX-${version_f}${arch_f}.zip"
