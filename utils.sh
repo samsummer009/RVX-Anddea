@@ -579,21 +579,6 @@ build_rv() {
 		p_patcher_args=("${p_patcher_args[@]//-[ei] ${microg_patch}/}")
 	fi
 
-	# Handle custom branding patches for modules
-	local custom_branding_patch
-	if [ "$build_mode" = module ]; then
-		if [[ "$table" == *"YouTube-Music"* ]]; then
-			custom_branding_patch=$(grep "^Name: " <<<"$list_patches" | grep -i "Custom branding name for YouTube Music" || :) custom_branding_patch=${custom_branding_patch#*: }
-		elif [[ "$table" == *"YouTube"* ]]; then
-			custom_branding_patch=$(grep "^Name: " <<<"$list_patches" | grep -i "Custom branding name for YouTube" || :) custom_branding_patch=${custom_branding_patch#*: }
-		fi
-		if [ -n "$custom_branding_patch" ]; then
-			# For module builds, always exclude custom branding patches
-			epr "Custom branding patches are automatically excluded for module builds."
-			p_patcher_args=("${p_patcher_args[@]//-[ei] ${custom_branding_patch}/}")
-		fi
-	fi
-
 	local patcher_args patched_apk build_mode
 	local rv_brand_f=${args[rv_brand],,}
 	rv_brand_f=${rv_brand_f// /-}
@@ -601,23 +586,22 @@ build_rv() {
 	for build_mode in "${build_mode_arr[@]}"; do
 		patcher_args=("${p_patcher_args[@]}")
 		pr "Building '${table}' in '$build_mode' mode"
-		if [ -n "$microg_patch" ]; then
+
+		# Handle custom branding patches for modules
+		local custom_branding_patch
+		if [ "$build_mode" = module ]; then
 			if [[ "$table" == *"YouTube-Music"* ]]; then
-				patched_apk="${TEMP_DIR}/${app_name}-RVX-${version_f}-${build_mode}-temporary-files.apk"
-			elif [[ "$table" == *"YouTube-Monet"* ]]; then
-				patched_apk="${TEMP_DIR}/${app_name}-OG-Monet-RVX-${version_f}-${build_mode}-temporary-files.apk"
-			else
-				patched_apk="${TEMP_DIR}/${app_name}-OG-RVX-${version_f}-${build_mode}-temporary-files.apk"
+				custom_branding_patch=$(grep "^Name: " <<<"$list_patches" | grep -i "Custom branding name for YouTube Music" || :) custom_branding_patch=${custom_branding_patch#*: }
+			elif [[ "$table" == *"YouTube"* ]]; then
+				custom_branding_patch=$(grep "^Name: " <<<"$list_patches" | grep -i "Custom branding name for YouTube" || :) custom_branding_patch=${custom_branding_patch#*: }
 			fi
-		else
-			if [[ "$table" == *"YouTube-Music"* ]]; then
-				patched_apk="${TEMP_DIR}/${app_name}-RVX-${version_f}-temporary-files.apk"
-			elif [[ "$table" == *"YouTube-Monet"* ]]; then
-				patched_apk="${TEMP_DIR}/${app_name}-OG-Monet-RVX-${version_f}-temporary-files.apk"
-			else
-				patched_apk="${TEMP_DIR}/${app_name}-OG-RVX-${version_f}-temporary-files.apk"
+			if [ -n "$custom_branding_patch" ]; then
+				# For module builds, always exclude custom branding patches
+				epr "Custom branding patches are automatically excluded for module builds."
+				patcher_args=("${patcher_args[@]//-[ei] ${custom_branding_patch}/}")
 			fi
 		fi
+
 		if [ -n "$microg_patch" ]; then
 			if [ "$build_mode" = apk ]; then
 				patcher_args+=("-e \"${microg_patch}\"")
