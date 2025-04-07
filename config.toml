@@ -3,7 +3,7 @@ parallel-jobs = 1
 
 # ReVanced Extended
 [YouTube-RVX]
-# enabled = false
+enabled = false
 app-name = "YouTube"
 apkmirror-dlurl = "https://apkmirror.com/apk/google-inc/youtube/"
 # archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.youtube"
@@ -29,7 +29,7 @@ patches-source = "inotia00/revanced-patches"
 integrations-source = "inotia00/revanced-integrations"
 cli-source = "inotia00/revanced-cli"
 rv-brand = "RVX"
-build-mode = "both"
+build-mode = "module "
 version = "latest"
 included-patches = "'Visual preferences icons' 'Return YouTube Username' 'Settings for YouTube' 'Custom branding name for YouTube' 'MaterialYou'"
 excluded-patches = "'Custom Shorts action buttons' 'Custom branding icon for YouTube' 'Theme'"
@@ -39,7 +39,7 @@ patcher-args = "--legacy-options=patch-options.json"
 
 # ReVanced Extended
 [YouTube-Music-RVX]
-# enabled = false
+enabled = false
 app-name = "YouTube-Music"
 apkmirror-dlurl = "https://apkmirror.com/apk/google-inc/youtube-music/"
 # archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.apps.youtube.music"
@@ -58,7 +58,7 @@ patcher-args = "--legacy-options=patch-options-music.json"
 
 # ReVanced Extended
 [YouTube-Music-Monet-RVX]
-# # enabled = false
+# enabled = false
 app-name = "YouTube-Music-Monet"
 apkmirror-dlurl = "https://apkmirror.com/apk/google-inc/youtube-music/"
 # archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.apps.youtube.music"
@@ -66,8 +66,8 @@ patches-source = "inotia00/revanced-patches"
 integrations-source = "inotia00/revanced-integrations"
 cli-source = "inotia00/revanced-cli"
 rv-brand = "RVX"
-arch = "both"
-build-mode = "both"
+arch = "arm64-v8a"
+build-mode = "module "
 version = "latest"
 included-patches = "'Hide player overlay filter' 'Settings for YouTube Music' 'Custom branding name for YouTube Music' 'Dark theme'"
 excluded-patches = "'Custom branding icon for YouTube Music'"
