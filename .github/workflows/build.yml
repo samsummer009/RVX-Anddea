@@ -85,6 +85,7 @@ jobs:
         run: |
           git checkout -f update || git switch --discard-changes --orphan update
           cp -f build.tmp build.md
+          mkdir -p update_json
           get_update_json() {
             echo "{
             \"version\": \"$1\",
