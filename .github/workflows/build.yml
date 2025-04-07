@@ -85,7 +85,6 @@ jobs:
         run: |
           git checkout -f update || git switch --discard-changes --orphan update
           cp -f build.tmp build.md
-          mkdir -p update-json
           get_update_json() {
             echo "{
             \"version\": \"$1\",
@@ -104,17 +103,17 @@ jobs:
             VER=$(echo "$ZIP_S" | grep version=)
             VER="${VER##*=}"
             DLURL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/${{ steps.next_ver_code.outputs.NEXT_VER_CODE }}/${OUTPUT}"
-            get_update_json "$VER" "$DLURL" >"../update-json/$UPDATE_JSON"
+            get_update_json "$VER" "$DLURL" >"../$UPDATE_JSON"
           done
           cd ..
 
-          find update-json -name "*-update.json" | grep . || : >update-json/dummy-update.json
+          find . -name "*-update.json" | grep . || : >dummy-update.json
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           branch: update
           skip_checkout: true
-          file_pattern: build.md update-json/*-update.json
+          file_pattern: build.md *-update.json
           commit_message: Bump version ${{ steps.next_ver_code.outputs.NEXT_VER_CODE }}
           commit_options: '--signoff'
           commit_author: samsummer009 <pm563838@gmail.com>

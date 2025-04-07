@@ -656,11 +656,6 @@ build_rv() {
 			"https://raw.githubusercontent.com/${GITHUB_REPOSITORY-}/update/${upj}" \
 			"$base_template"
 
-		if [ "$ENABLE_MAGISK_UPDATE" = true ]; then 
-			local updateJson="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/raw/update/update-json/${upj}"
-			echo "updateJson=${updateJson}" >>"${base_template}/module.prop"
-		fi
-
 		if [[ "$table" == *"YouTube-Music"* ]]; then
 			local module_output="${app_name}-RVX-${version_f}${arch_f}.zip"
 		elif [[ "$table" == *"YouTube-Monet"* ]]; then
