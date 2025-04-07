@@ -103,17 +103,17 @@ jobs:
             VER=$(echo "$ZIP_S" | grep version=)
             VER="${VER##*=}"
             DLURL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/${{ steps.next_ver_code.outputs.NEXT_VER_CODE }}/${OUTPUT}"
-            get_update_json "$VER" "$DLURL" >"../$UPDATE_JSON"
+            get_update_json "$VER" "$DLURL" >"../update_json/$UPDATE_JSON"
           done
           cd ..
 
-          find . -name "*-update.json" | grep . || : >dummy-update.json
+          find update_json -name "*-update.json" | grep . || : >update_json/dummy-update.json
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           branch: update
           skip_checkout: true
-          file_pattern: build.md *-update.json
+          file_pattern: build.md update_json/*-update.json
           commit_message: Bump version ${{ steps.next_ver_code.outputs.NEXT_VER_CODE }}
           commit_options: '--signoff'
           commit_author: samsummer009 <pm563838@gmail.com>
@@ -126,6 +126,7 @@ jobs:
           cd build || { echo "build folder not found"; exit 1; }
 
           TG_CHAT="@ytytmrvx"
+          TG_CHAT_TEST="@ytytmtest"
           NL=$'\n'
           APKS=""
           MODULES=""
@@ -161,3 +162,4 @@ jobs:
           MSG=${MSG:0:9450}
           POST="https://api.telegram.org/bot${TG_TOKEN}/sendMessage"
           curl -X POST --data-urlencode "parse_mode=Markdown" --data-urlencode "disable_web_page_preview=true" --data-urlencode "text=${MSG}" --data-urlencode "chat_id=${TG_CHAT}" "$POST"
+          curl -X POST --data-urlencode "parse_mode=Markdown" --data-urlencode "disable_web_page_preview=true" --data-urlencode "text=${MSG}" --data-urlencode "chat_id=${TG_CHAT_TEST}" "$POST"
