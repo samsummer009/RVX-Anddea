@@ -579,17 +579,6 @@ build_rv() {
 		p_patcher_args=("${p_patcher_args[@]//-[ei] ${microg_patch}/}")
 	fi
 
-	local custom_branding_patch
-	if [[ "$table" == *"YouTube-Music"* ]]; then
-		custom_branding_patch=$(grep "^Name: " <<<"$list_patches" | grep -i "Custom branding name for YouTube Music" || :) custom_branding_patch=${custom_branding_patch#*: }
-	elif [[ "$table" == *"YouTube"* ]]; then
-		custom_branding_patch=$(grep "^Name: " <<<"$list_patches" | grep -i "Custom branding name for YouTube" || :) custom_branding_patch=${custom_branding_patch#*: }
-	fi
-	if [ -n "$custom_branding_patch" ] && [[ ${p_patcher_args[*]} =~ $custom_branding_patch ]]; then
-		epr "You cant include/exclude custom branding patch as that's done by rvmm builder automatically."
-		p_patcher_args=("${p_patcher_args[@]//-[ei] ${custom_branding_patch}/}")
-	fi
-
 	local patcher_args patched_apk build_mode
 	local rv_brand_f=${args[rv_brand],,}
 	rv_brand_f=${rv_brand_f// /-}
@@ -606,6 +595,12 @@ build_rv() {
 			fi
 		fi
 
+		local custom_branding_patch
+		if [[ "$table" == *"YouTube-Music"* ]]; then
+			custom_branding_patch=$(grep "^Name: " <<<"$list_patches" | grep -i "Custom branding name for YouTube Music" || :) custom_branding_patch=${custom_branding_patch#*: }
+		elif [[ "$table" == *"YouTube"* ]]; then
+			custom_branding_patch=$(grep "^Name: " <<<"$list_patches" | grep -i "Custom branding name for YouTube" || :) custom_branding_patch=${custom_branding_patch#*: }
+		fi
 		if [ -n "$custom_branding_patch" ]; then
 			if [ "$build_mode" = apk ]; then
 				patcher_args+=("-e \"${custom_branding_patch}\"")
