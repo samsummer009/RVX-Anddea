@@ -587,8 +587,23 @@ build_rv() {
 		patcher_args=("${p_patcher_args[@]}")
 		pr "Building '${table}' in '$build_mode' mode"
 
+		if [ -n "$microg_patch" ]; then
+			if [ "$build_mode" = apk ]; then
+				patcher_args+=("-e \"${microg_patch}\"")
+			elif [ "$build_mode" = module ]; then
+				patcher_args+=("-d \"${microg_patch}\"")
+			fi
+		fi
+
+		if [[ "$table" == *"YouTube-Music"* ]]; then
+			patched_apk="${TEMP_DIR}/${app_name}-RVX-${version_f}-${build_mode}-temporary-files.apk"
+		elif [[ "$table" == *"YouTube-Monet"* ]]; then
+			patched_apk="${TEMP_DIR}/${app_name}-OG-Monet-RVX-${version_f}-${build_mode}-temporary-files.apk"
+		else
+			patched_apk="${TEMP_DIR}/${app_name}-OG-RVX-${version_f}-${build_mode}-temporary-files.apk"
+		fi
+
 		# Handle custom branding patches for modules
-		local custom_branding_patch
 		if [ "$build_mode" = module ]; then
 			if [[ "$table" == *"YouTube-Music"* ]]; then
 				custom_branding_patch=$(grep "^Name: " <<<"$list_patches" | grep -i "Custom branding name for YouTube Music" || :) custom_branding_patch=${custom_branding_patch#*: }
@@ -602,13 +617,6 @@ build_rv() {
 			fi
 		fi
 
-		if [ -n "$microg_patch" ]; then
-			if [ "$build_mode" = apk ]; then
-				patcher_args+=("-e \"${microg_patch}\"")
-			elif [ "$build_mode" = module ]; then
-				patcher_args+=("-d \"${microg_patch}\"")
-			fi
-		fi
 		if [ "${args[riplib]}" = true ]; then
 			patcher_args+=("--rip-lib x86_64 --rip-lib x86")
 			if [ "$build_mode" = module ]; then
