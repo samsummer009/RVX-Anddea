@@ -83,52 +83,38 @@ jobs:
       - name: Update changelog and Magisk update json
         id: update_config
         run: |
+          git checkout -f update || git switch --discard-changes --orphan update
+          cp -f build.tmp build.md
           get_update_json() {
             echo "{
               \"version\": \"$1\",
               \"versionCode\": ${{ steps.next_ver_code.outputs.NEXT_VER_CODE }},
               \"zipUrl\": \"$2\",
-              \"changelog\": \"https://raw.githubusercontent.com/$GITHUB_REPOSITORY/update/build.md\"
+              \"changelog\": \"https://raw.githubusercontent.com/$GITHUB_REPOSITORY/update/build.md\",
+              \"timestamp\": $(date +%s),
+              \"compatibility\": {
+                \"minApi\": 24,
+                \"maxApi\": 33
+              }
             }"
           }
-
-          # Create update branch if it doesn't exist
-          git checkout -f update || git switch --discard-changes --orphan update
-          cp -f build.tmp build.md
 
           cd build || { echo "build folder not found"; exit 1; }
           for OUTPUT in *magisk*.zip; do
             [ "$OUTPUT" = "*magisk*.zip" ] && continue
-            echo "Processing $OUTPUT"
             ZIP_S=$(unzip -p "$OUTPUT" module.prop)
-            echo "Module prop contents: $ZIP_S"
-            
-            # Extract module name from module.prop
-            MODULE_NAME=$(echo "$ZIP_S" | grep id= | cut -d= -f2)
-            echo "Module name from prop: $MODULE_NAME"
-            
-            # Construct update JSON filename
-            UPDATE_JSON="${MODULE_NAME}-update.json"
-            echo "Update JSON filename: $UPDATE_JSON"
-            
+            if ! UPDATE_JSON=$(echo "$ZIP_S" | grep updateJson); then continue; fi
+            UPDATE_JSON="${UPDATE_JSON##*/}"
             VER=$(echo "$ZIP_S" | grep version=)
             VER="${VER##*=}"
-            echo "Version: $VER"
-            
             DLURL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/${{ steps.next_ver_code.outputs.NEXT_VER_CODE }}/${OUTPUT}"
-            echo "Creating update JSON: $UPDATE_JSON"
             get_update_json "$VER" "$DLURL" >"../$UPDATE_JSON"
           done
           cd ..
 
-          # List all JSON files
-          echo "Generated JSON files:"
-          ls -la *-update.json || true
-
-          # Create dummy file only if no JSON files exist
+          # Only create dummy if no update JSONs were created
           if [ ! -f *-update.json ]; then
-            echo "No update JSON files found, creating dummy"
-            : >dummy-update.json
+            echo "{}" > dummy-update.json
           fi
 
       - uses: stefanzweifel/git-auto-commit-action@v5
@@ -147,7 +133,7 @@ jobs:
         run: |
           cd build || { echo "build folder not found"; exit 1; }
 
-          TG_CHAT="@ytytmtest"
+          TG_CHAT="@ytytmrvx"
           NL=$'\n'
           APKS=""
           MODULES=""
