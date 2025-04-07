@@ -579,6 +579,21 @@ build_rv() {
 		p_patcher_args=("${p_patcher_args[@]//-[ei] ${microg_patch}/}")
 	fi
 
+	# Handle custom branding patches for modules
+	local custom_branding_patch
+	if [ "$build_mode" = module ]; then
+		if [[ "$table" == *"YouTube-Music"* ]]; then
+			custom_branding_patch=$(grep "^Name: " <<<"$list_patches" | grep -i "Custom branding name for YouTube Music" || :) custom_branding_patch=${custom_branding_patch#*: }
+		elif [[ "$table" == *"YouTube"* ]]; then
+			custom_branding_patch=$(grep "^Name: " <<<"$list_patches" | grep -i "Custom branding name for YouTube" || :) custom_branding_patch=${custom_branding_patch#*: }
+		fi
+		if [ -n "$custom_branding_patch" ]; then
+			# For module builds, always exclude custom branding patches
+			epr "Custom branding patches are automatically excluded for module builds."
+			p_patcher_args=("${p_patcher_args[@]//-[ei] ${custom_branding_patch}/}")
+		fi
+	fi
+
 	local patcher_args patched_apk build_mode
 	local rv_brand_f=${args[rv_brand],,}
 	rv_brand_f=${rv_brand_f// /-}
