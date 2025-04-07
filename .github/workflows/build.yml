@@ -96,10 +96,11 @@ jobs:
           for OUTPUT in *magisk*.zip; do
             [ "$OUTPUT" = "*magisk*.zip" ] && continue
             ZIP_S=$(unzip -p "$OUTPUT" module.prop)
-            if ! UPDATE_JSON=$(echo "$ZIP_S" | grep updateJson); then continue; fi
-            UPDATE_JSON="${UPDATE_JSON##*/}"
-            VER=$(echo "$ZIP_S" | grep version=)
-            VER="${VER##*=}"
+            if [ -z "$ZIP_S" ]; then continue; fi
+            UPDATE_JSON=$(echo "$ZIP_S" | grep updateJson | cut -d'=' -f2)
+            if [ -z "$UPDATE_JSON" ]; then continue; fi
+            VER=$(echo "$ZIP_S" | grep version= | cut -d'=' -f2)
+            if [ -z "$VER" ]; then continue; fi
             DLURL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/${{ steps.next_ver_code.outputs.NEXT_VER_CODE }}/${OUTPUT}"
             get_update_json() {
               echo "{
