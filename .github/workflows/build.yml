@@ -97,37 +97,17 @@ jobs:
           cd build || { echo "build folder not found"; exit 1; }
           for OUTPUT in *magisk*.zip; do
             [ "$OUTPUT" = "*magisk*.zip" ] && continue
-            echo "Processing $OUTPUT"
             ZIP_S=$(unzip -p "$OUTPUT" module.prop)
-            echo "Module prop contents: $ZIP_S"
-            if ! UPDATE_JSON=$(echo "$ZIP_S" | grep updateJson); then 
-              echo "No updateJson found in $OUTPUT"
-              continue
-            fi
+            if ! UPDATE_JSON=$(echo "$ZIP_S" | grep updateJson); then continue; fi
+            UPDATE_JSON="${UPDATE_JSON##*/}"
             VER=$(echo "$ZIP_S" | grep version=)
             VER="${VER##*=}"
-            ID=$(echo "$ZIP_S" | grep id=)
-            ID="${ID##*=}"
-            # Remove architecture from ID if present
-            ID="${ID% (*)}"
-            echo "Generating update JSON for $ID with version $VER"
             DLURL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/${{ steps.next_ver_code.outputs.NEXT_VER_CODE }}/${OUTPUT}"
-            get_update_json "$VER" "$DLURL" >"../${ID}-update.json"
-            echo "Created update JSON: ${ID}-update.json"
+            get_update_json "$VER" "$DLURL" >"../$UPDATE_JSON"
           done
           cd ..
 
-          # Create update branch if it doesn't exist
-          git checkout -f update || git switch --discard-changes --orphan update
-          
-          # Check if any JSON files were generated
-          if [ -f *-update.json ]; then
-            echo "Found update JSON files:"
-            ls -la *-update.json
-          else
-            echo "No update JSON files found, creating dummy"
-            : >dummy-update.json
-          fi
+          find . -name "*-update.json" | grep . || : >dummy-update.json
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
