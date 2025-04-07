@@ -487,14 +487,10 @@ build_rv() {
 	local dl_from=${args[dl_from]}
 	local arch=${args[arch]}
 	local arch_f=""
-	if [ -n "$arch" ] && [ "$arch" != "all" ]; then
-		if [[ "$arch" == *" "* ]]; then
-			# Multiple architectures specified
-			arch_f="(${arch// /})"
-		else
-			# Single architecture
-			arch_f="(${arch})"
-		fi
+	if [ "$arch" ]; then
+		arch_f=".${arch// /}"
+	else
+		arch_f=".${arch}"
 	fi
 
 	local p_patcher_args=()

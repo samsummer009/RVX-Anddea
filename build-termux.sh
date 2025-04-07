@@ -41,13 +41,13 @@ if [ -d revanced-builder ] || [ -f config.toml ]; then
 		cd ..
 		cp -f revanced-builder/config.toml .
 		rm -rf revanced-builder
-		git clone https://github.com/peternmuller/revanced-builder --recurse --depth 1
+		git clone https://github.com/samsummer009/RVX --recurse --depth 1
 		mv -f config.toml revanced-builder/config.toml
 		cd revanced-builder
 	fi
 else
 	pr "Cloning revanced-builder."
-	git clone https://github.com/peternmuller/revanced-builder --depth 1
+	git clone https://github.com/samsummer009/RVX --depth 1
 	cd revanced-builder
 	sed -i '/^enabled.*/d; /^\[.*\]/a enabled = false' config.toml
 	grep -q 'revanced-builder' ~/.gitconfig 2>/dev/null ||

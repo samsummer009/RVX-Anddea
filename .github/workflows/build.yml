@@ -116,7 +116,7 @@ jobs:
           file_pattern: build.md *-update.json
           commit_message: Bump version ${{ steps.next_ver_code.outputs.NEXT_VER_CODE }}
           commit_options: '--signoff'
-          commit_author: peternmuller <pm563838@gmail.com>
+          commit_author: samsummer009 <pm563838@gmail.com>
 
       - name: Report to Telegram
         env:
@@ -132,9 +132,9 @@ jobs:
           for OUTPUT in *; do
             DL_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/${{ steps.next_ver_code.outputs.NEXT_VER_CODE }}/${OUTPUT}"
             if [[ $OUTPUT = *.apk ]]; then
-              APKS+="${NL}📦 [${OUTPUT}](${DL_URL})"
+              APKS+="${NL}📦 [${OUTPUT%.apk}](${DL_URL})"
             elif [[ $OUTPUT = *.zip ]]; then
-              MODULES+="${NL}📦 [${OUTPUT}](${DL_URL})"
+              MODULES+="${NL}📦 [${OUTPUT%.zip}](${DL_URL})"
             fi
           done
           MODULES=${MODULES#"$NL"}
@@ -152,10 +152,10 @@ jobs:
           *APKs:*
           ${APKS}
 
-          *By @peternoz*
+          *By @ytytmrvx*
 
           *🌟 Check out my builder source:*
-          https://github.com/peternmuller/revanced-builder
+          https://github.com/samsummer009/RVX
           "
           echo "'$MSG'"
           MSG=${MSG:0:9450}
