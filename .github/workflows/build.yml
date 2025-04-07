@@ -83,18 +83,21 @@ jobs:
       - name: Update changelog and Magisk update json
         id: update_config
         run: |
-          # Delete existing update branch if it exists
-          git branch -D update || true
-          git checkout --orphan update
-          git rm -rf .
-
-          # Copy build.md
+          git checkout -f update || git switch --discard-changes --orphan update
           cp -f build.tmp build.md
+          get_update_json() {
+            echo "{
+            \"version\": \"$1\",
+            \"versionCode\": ${{ steps.next_ver_code.outputs.NEXT_VER_CODE }},
+            \"zipUrl\": \"$2\",
+            \"changelog\": \"https://raw.githubusercontent.com/$GITHUB_REPOSITORY/update/build.md\"
+          }"
+          }
 
           # Generate update JSONs
           cd build || { echo "build folder not found"; exit 1; }
-          for OUTPUT in *magisk*.zip; do
-            [ "$OUTPUT" = "*magisk*.zip" ] && continue
+          for OUTPUT in *.zip; do
+            [ "$OUTPUT" = "*.zip" ] && continue
             ZIP_S=$(unzip -p "$OUTPUT" module.prop)
             if [ -z "$ZIP_S" ]; then continue; fi
             UPDATE_JSON=$(echo "$ZIP_S" | grep updateJson | cut -d'=' -f2)
@@ -102,34 +105,20 @@ jobs:
             VER=$(echo "$ZIP_S" | grep version= | cut -d'=' -f2)
             if [ -z "$VER" ]; then continue; fi
             DLURL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/${{ steps.next_ver_code.outputs.NEXT_VER_CODE }}/${OUTPUT}"
-            get_update_json() {
-              echo "{
-                \"version\": \"$1\",
-                \"versionCode\": ${{ steps.next_ver_code.outputs.NEXT_VER_CODE }},
-                \"zipUrl\": \"$2\",
-                \"changelog\": \"https://raw.githubusercontent.com/$GITHUB_REPOSITORY/update/build.md\",
-                \"timestamp\": $(date +%s),
-                \"compatibility\": {
-                  \"minApi\": 24,
-                  \"maxApi\": 33
-                }
-              }"
-            }
             get_update_json "$VER" "$DLURL" >"../$UPDATE_JSON"
           done
           cd ..
 
-          # Only create dummy if no update JSONs were created
-          if [ ! -f *-update.json ]; then
-            echo "{}" > dummy-update.json
-          fi
+          find . -name "*-update.json" | grep . || : >dummy-update.json
 
-          # Add and commit files
-          git add build.md *-update.json
-          git config --global user.email "pm563838@gmail.com"
-          git config --global user.name "samsummer009"
-          git commit -m "Bump version ${{ steps.next_ver_code.outputs.NEXT_VER_CODE }}" --signoff
-          git push -f origin update
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          branch: update
+          skip_checkout: true
+          file_pattern: build.md *-update.json
+          commit_message: Bump version ${{ steps.next_ver_code.outputs.NEXT_VER_CODE }}
+          commit_options: '--signoff'
+          commit_author: samsummer009 <pm563838@gmail.com>
 
       - name: Report to Telegram
         env:
