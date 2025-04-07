@@ -103,9 +103,9 @@ jobs:
             ZIP_S=$(unzip -p "$OUTPUT" module.prop)
             echo "Module prop contents: $ZIP_S"
             
-            # Extract module name from the zip filename
-            MODULE_NAME=$(echo "$OUTPUT" | sed 's/-[0-9].*//')
-            echo "Module name: $MODULE_NAME"
+            # Extract module name from module.prop
+            MODULE_NAME=$(echo "$ZIP_S" | grep id= | cut -d= -f2)
+            echo "Module name from prop: $MODULE_NAME"
             
             # Construct update JSON filename
             UPDATE_JSON="${MODULE_NAME}-update.json"
