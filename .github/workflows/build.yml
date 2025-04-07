@@ -83,22 +83,15 @@ jobs:
       - name: Update changelog and Magisk update json
         id: update_config
         run: |
-          git checkout -f update || git switch --discard-changes --orphan update
-          cp -f build.tmp build.md
-          get_update_json() {
-            echo "{
-              \"version\": \"$1\",
-              \"versionCode\": ${{ steps.next_ver_code.outputs.NEXT_VER_CODE }},
-              \"zipUrl\": \"$2\",
-              \"changelog\": \"https://raw.githubusercontent.com/$GITHUB_REPOSITORY/update/build.md\",
-              \"timestamp\": $(date +%s),
-              \"compatibility\": {
-                \"minApi\": 24,
-                \"maxApi\": 33
-              }
-            }"
-          }
+          # Delete existing update branch if it exists
+          git branch -D update || true
+          git checkout --orphan update
+          git rm -rf .
 
+          # Copy build.md
+          cp -f build.tmp build.md
+
+          # Generate update JSONs
           cd build || { echo "build folder not found"; exit 1; }
           for OUTPUT in *magisk*.zip; do
             [ "$OUTPUT" = "*magisk*.zip" ] && continue
@@ -108,6 +101,19 @@ jobs:
             VER=$(echo "$ZIP_S" | grep version=)
             VER="${VER##*=}"
             DLURL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/${{ steps.next_ver_code.outputs.NEXT_VER_CODE }}/${OUTPUT}"
+            get_update_json() {
+              echo "{
+                \"version\": \"$1\",
+                \"versionCode\": ${{ steps.next_ver_code.outputs.NEXT_VER_CODE }},
+                \"zipUrl\": \"$2\",
+                \"changelog\": \"https://raw.githubusercontent.com/$GITHUB_REPOSITORY/update/build.md\",
+                \"timestamp\": $(date +%s),
+                \"compatibility\": {
+                  \"minApi\": 24,
+                  \"maxApi\": 33
+                }
+              }"
+            }
             get_update_json "$VER" "$DLURL" >"../$UPDATE_JSON"
           done
           cd ..
@@ -117,14 +123,12 @@ jobs:
             echo "{}" > dummy-update.json
           fi
 
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          branch: update
-          skip_checkout: true
-          file_pattern: build.md *-update.json
-          commit_message: Bump version ${{ steps.next_ver_code.outputs.NEXT_VER_CODE }}
-          commit_options: '--signoff'
-          commit_author: samsummer009 <pm563838@gmail.com>
+          # Add and commit files
+          git add build.md *-update.json
+          git config --global user.email "pm563838@gmail.com"
+          git config --global user.name "samsummer009"
+          git commit -m "Bump version ${{ steps.next_ver_code.outputs.NEXT_VER_CODE }}" --signoff
+          git push -f origin update
 
       - name: Report to Telegram
         env:
