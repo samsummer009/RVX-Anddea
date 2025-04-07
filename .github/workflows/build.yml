@@ -102,17 +102,19 @@ jobs:
             echo "Processing $OUTPUT"
             ZIP_S=$(unzip -p "$OUTPUT" module.prop)
             echo "Module prop contents: $ZIP_S"
-            if ! UPDATE_JSON=$(echo "$ZIP_S" | grep updateJson); then 
-              echo "No updateJson found in $OUTPUT"
-              continue
-            fi
-            echo "Found updateJson: $UPDATE_JSON"
-            UPDATE_JSON="${UPDATE_JSON#updateJson=}"
-            UPDATE_JSON="${UPDATE_JSON##*/}"
-            echo "Extracted JSON filename: $UPDATE_JSON"
+            
+            # Extract module name from the zip filename
+            MODULE_NAME=$(echo "$OUTPUT" | sed 's/-[0-9].*//')
+            echo "Module name: $MODULE_NAME"
+            
+            # Construct update JSON filename
+            UPDATE_JSON="${MODULE_NAME}-update.json"
+            echo "Update JSON filename: $UPDATE_JSON"
+            
             VER=$(echo "$ZIP_S" | grep version=)
             VER="${VER##*=}"
             echo "Version: $VER"
+            
             DLURL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/${{ steps.next_ver_code.outputs.NEXT_VER_CODE }}/${OUTPUT}"
             echo "Creating update JSON: $UPDATE_JSON"
             get_update_json "$VER" "$DLURL" >"../$UPDATE_JSON"
