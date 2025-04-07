@@ -159,6 +159,31 @@ for table_name in $(toml_get_table_names); do
 		idx=$((idx + 1))
 		build_rv "$(declare -p app_args)" &
 	fi
+
+	# Handle custom branding patches
+	local branding_patch
+	if [[ "$table_name" == *"YouTube"* ]]; then
+		if [[ "$table_name" == *"Music"* ]]; then
+			branding_patch="Custom branding name for YouTube Music"
+		else
+			branding_patch="Custom branding name for YouTube"
+		fi
+		if [ "${app_args[build_mode]}" = apk ]; then
+			app_args[patcher_args]+=" -e \"${branding_patch}\""
+		elif [ "${app_args[build_mode]}" = module ]; then
+			app_args[patcher_args]+=" -d \"${branding_patch}\""
+		fi
+	fi
+
+	if [ "${app_args[riplib]}" = true ]; then
+		if [ -n "$microg_patch" ]; then
+			if [ "${app_args[build_mode]}" = apk ]; then
+				app_args[patcher_args]+=" -e \"${microg_patch}\""
+			elif [ "${app_args[build_mode]}" = module ]; then
+				app_args[patcher_args]+=" -d \"${microg_patch}\""
+			fi
+		fi
+	fi
 done
 wait
 rm -rf temp/tmp.*

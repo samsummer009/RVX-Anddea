@@ -586,7 +586,23 @@ build_rv() {
 	for build_mode in "${build_mode_arr[@]}"; do
 		patcher_args=("${p_patcher_args[@]}")
 		pr "Building '${table}' in '$build_mode' mode"
-
+		if [ -n "$microg_patch" ]; then
+			if [[ "$table" == *"YouTube-Music"* ]]; then
+				patched_apk="${TEMP_DIR}/${app_name}-RVX-${version_f}-${build_mode}-temporary-files.apk"
+			elif [[ "$table" == *"YouTube-Monet"* ]]; then
+				patched_apk="${TEMP_DIR}/${app_name}-OG-Monet-RVX-${version_f}-${build_mode}-temporary-files.apk"
+			else
+				patched_apk="${TEMP_DIR}/${app_name}-OG-RVX-${version_f}-${build_mode}-temporary-files.apk"
+			fi
+		else
+			if [[ "$table" == *"YouTube-Music"* ]]; then
+				patched_apk="${TEMP_DIR}/${app_name}-RVX-${version_f}-temporary-files.apk"
+			elif [[ "$table" == *"YouTube-Monet"* ]]; then
+				patched_apk="${TEMP_DIR}/${app_name}-OG-Monet-RVX-${version_f}-temporary-files.apk"
+			else
+				patched_apk="${TEMP_DIR}/${app_name}-OG-RVX-${version_f}-temporary-files.apk"
+			fi
+		fi
 		if [ -n "$microg_patch" ]; then
 			if [ "$build_mode" = apk ]; then
 				patcher_args+=("-e \"${microg_patch}\"")
@@ -594,29 +610,6 @@ build_rv() {
 				patcher_args+=("-d \"${microg_patch}\"")
 			fi
 		fi
-
-		local custom_branding_patch
-		if [[ "$table" == *"YouTube-Music"* ]]; then
-			custom_branding_patch=$(grep "^Name: " <<<"$list_patches" | grep -i "Custom branding name for YouTube Music" || :) custom_branding_patch=${custom_branding_patch#*: }
-		elif [[ "$table" == *"YouTube"* ]]; then
-			custom_branding_patch=$(grep "^Name: " <<<"$list_patches" | grep -i "Custom branding name for YouTube" || :) custom_branding_patch=${custom_branding_patch#*: }
-		fi
-		if [ -n "$custom_branding_patch" ]; then
-			if [ "$build_mode" = apk ]; then
-				patcher_args+=("-e \"${custom_branding_patch}\"")
-			elif [ "$build_mode" = module ]; then
-				patcher_args+=("-d \"${custom_branding_patch}\"")
-			fi
-		fi
-
-		if [[ "$table" == *"YouTube-Music"* ]]; then
-			patched_apk="${TEMP_DIR}/${app_name}-RVX-${version_f}-${build_mode}-temporary-files.apk"
-		elif [[ "$table" == *"YouTube-Monet"* ]]; then
-			patched_apk="${TEMP_DIR}/${app_name}-OG-Monet-RVX-${version_f}-${build_mode}-temporary-files.apk"
-		else
-			patched_apk="${TEMP_DIR}/${app_name}-OG-RVX-${version_f}-${build_mode}-temporary-files.apk"
-		fi
-
 		if [ "${args[riplib]}" = true ]; then
 			patcher_args+=("--rip-lib x86_64 --rip-lib x86")
 			if [ "$build_mode" = module ]; then
