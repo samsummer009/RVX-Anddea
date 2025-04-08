@@ -579,6 +579,13 @@ build_rv() {
 		p_patcher_args=("${p_patcher_args[@]//-[ei] ${microg_patch}/}")
 	fi
 
+	local branding_patch
+	branding_patch=$(grep "^Name: " <<<"$list_patches" | grep -i "custom branding" || :) branding_patch=${branding_patch#*: }
+	if [ -n "$branding_patch" ] && [[ ${p_patcher_args[*]} =~ $branding_patch ]]; then
+		epr "You cant include/exclude custom branding patch as that's done by rvmm builder automatically."
+		p_patcher_args=("${p_patcher_args[@]//-[ei] ${branding_patch}/}")
+	fi
+
 	local patcher_args patched_apk build_mode
 	local rv_brand_f=${args[rv_brand],,}
 	rv_brand_f=${rv_brand_f// /-}
@@ -608,6 +615,18 @@ build_rv() {
 				patcher_args+=("-e \"${microg_patch}\"")
 			elif [ "$build_mode" = module ]; then
 				patcher_args+=("-d \"${microg_patch}\"")
+			fi
+		fi
+		if [ -n "$branding_patch" ]; then
+			if [ "$build_mode" = apk ]; then
+				patcher_args+=("-e \"${branding_patch}\"")
+				if [[ "$table" == *"YouTube-Music"* ]]; then
+					patcher_args+=("--options \"appName=${args[rv_brand]} Music\"")
+				else
+					patcher_args+=("--options \"appName=${args[rv_brand]}\"")
+				fi
+			elif [ "$build_mode" = module ]; then
+				patcher_args+=("-d \"${branding_patch}\"")
 			fi
 		fi
 		if [ "${args[riplib]}" = true ]; then
