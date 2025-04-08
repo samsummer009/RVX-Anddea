@@ -579,13 +579,6 @@ build_rv() {
 		p_patcher_args=("${p_patcher_args[@]//-[ei] ${microg_patch}/}")
 	fi
 
-	local branding_patch
-	branding_patch=$(grep "^Name: " <<<"$list_patches" | grep -i "custom branding" || :) branding_patch=${branding_patch#*: }
-	if [ -n "$branding_patch" ] && [[ ${p_patcher_args[*]} =~ $branding_patch ]]; then
-		epr "You cant include/exclude custom branding patch as that's done by rvmm builder automatically."
-		p_patcher_args=("${p_patcher_args[@]//-[ei] ${branding_patch}/}")
-	fi
-
 	local patcher_args patched_apk build_mode
 	local rv_brand_f=${args[rv_brand],,}
 	rv_brand_f=${rv_brand_f// /-}
@@ -617,18 +610,13 @@ build_rv() {
 				patcher_args+=("-d \"${microg_patch}\"")
 			fi
 		fi
-		if [ -n "$branding_patch" ]; then
-			if [ "$build_mode" = apk ]; then
-				patcher_args+=("-e \"${branding_patch}\"")
-				if [[ "$table" == *"YouTube-Music"* ]]; then
-					patcher_args+=("--options \"appName=${args[rv_brand]} Music\"")
-				else
-					patcher_args+=("--options \"appName=${args[rv_brand]}\"")
-				fi
-			elif [ "$build_mode" = module ]; then
-				patcher_args+=("-d \"${branding_patch}\"")
-				patcher_args=("${patcher_args[@]//--options \"appName=*\"/}")
-			fi
+		# Handle branding based on build mode
+		if [ "$build_mode" = module ]; then
+			# For module builds, remove all branding patches
+			local branding_patches=("Custom branding name for YouTube" "Custom branding name for YouTube Music" "Custom branding icon for YouTube" "Custom branding icon for YouTube Music")
+			for patch in "${branding_patches[@]}"; do
+				patcher_args+=("-d \"${patch}\"")
+			done
 		fi
 		if [ "${args[riplib]}" = true ]; then
 			patcher_args+=("--rip-lib x86_64 --rip-lib x86")
