@@ -627,6 +627,7 @@ build_rv() {
 				fi
 			elif [ "$build_mode" = module ]; then
 				patcher_args+=("-d \"${branding_patch}\"")
+				patcher_args=("${patcher_args[@]//--options \"appName=*\"/}")
 			fi
 		fi
 		if [ "${args[riplib]}" = true ]; then
