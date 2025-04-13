@@ -104,6 +104,8 @@ jobs:
             if [ -z "$UPDATE_JSON_URL" ]; then continue; fi
             # Extract just the filename from the URL
             UPDATE_JSON=$(basename "$UPDATE_JSON_URL")
+            # Fix UPDATE_JSON if it has problematic characters
+            UPDATE_JSON=$(echo "$UPDATE_JSON" | sed 's/ /-/g')
             VER=$(echo "$ZIP_S" | grep version= | cut -d'=' -f2)
             if [ -z "$VER" ]; then continue; fi
             DLURL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/${{ steps.next_ver_code.outputs.NEXT_VER_CODE }}/${OUTPUT}"

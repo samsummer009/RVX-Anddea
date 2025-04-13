@@ -651,7 +651,19 @@ build_rv() {
 		local base_template
 		base_template=$(mktemp -d -p "$TEMP_DIR")
 		cp -a $MODULE_TEMPLATE_DIR/. "$base_template"
-		local upj="${table,,}-update.json"
+		
+		# Process table name to create clean update.json filename
+		local clean_table="${table,,}"
+		# If the table name contains architecture info like "(arm64-v8a)", format it correctly
+		if [[ "$clean_table" == *"("*")"* ]]; then
+			# Extract the base table name and architecture
+			local base_table_name=$(echo "$clean_table" | sed 's/ (.*//')
+			local arch_info=$(echo "$clean_table" | sed 's/.*(\(.*\))/\1/')
+			# Create the update json filename with proper hyphen before architecture
+			local upj="${base_table_name}-($arch_info)-update.json"
+		else
+			local upj="${clean_table}-update.json"
+		fi
 
 		module_config "$base_template" "$pkg_name" "$version" "$arch"
 
