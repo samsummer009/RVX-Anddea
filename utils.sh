@@ -588,19 +588,19 @@ build_rv() {
 		pr "Building '${table}' in '$build_mode' mode"
 		if [ -n "$microg_patch" ]; then
 			if [[ "$table" == *"YouTube-Music"* ]]; then
-				patched_apk="${TEMP_DIR}/${app_name}-RVX-${version_f}-${build_mode}-temporary-files.apk"
+				patched_apk="${TEMP_DIR}/${app_name}-RVX-Anddea-${version_f}-${build_mode}-temporary-files.apk"
 			elif [[ "$table" == *"YouTube-Monet"* ]]; then
-				patched_apk="${TEMP_DIR}/${app_name}-OG-Monet-RVX-${version_f}-${build_mode}-temporary-files.apk"
+				patched_apk="${TEMP_DIR}/${app_name}-OG-Monet-RVX-Anddea-${version_f}-${build_mode}-temporary-files.apk"
 			else
-				patched_apk="${TEMP_DIR}/${app_name}-OG-RVX-${version_f}-${build_mode}-temporary-files.apk"
+				patched_apk="${TEMP_DIR}/${app_name}-OG-RVX-Anddea-${version_f}-${build_mode}-temporary-files.apk"
 			fi
 		else
 			if [[ "$table" == *"YouTube-Music"* ]]; then
-				patched_apk="${TEMP_DIR}/${app_name}-RVX-${version_f}-temporary-files.apk"
+				patched_apk="${TEMP_DIR}/${app_name}-RVX-Anddea-${version_f}-temporary-files.apk"
 			elif [[ "$table" == *"YouTube-Monet"* ]]; then
-				patched_apk="${TEMP_DIR}/${app_name}-OG-Monet-RVX-${version_f}-temporary-files.apk"
+				patched_apk="${TEMP_DIR}/${app_name}-OG-Monet-RVX-Anddea-${version_f}-temporary-files.apk"
 			else
-				patched_apk="${TEMP_DIR}/${app_name}-OG-RVX-${version_f}-temporary-files.apk"
+				patched_apk="${TEMP_DIR}/${app_name}-OG-RVX-Anddea-${version_f}-temporary-files.apk"
 			fi
 		fi
 		if [ -n "$microg_patch" ]; then
@@ -638,11 +638,11 @@ build_rv() {
 		fi
 		if [ "$build_mode" = apk ]; then
 			if [[ "$table" == *"YouTube-Music"* ]]; then
-				local apk_output="${BUILD_DIR}/${app_name}-RVX-${version_f}${arch_f}.apk"
+				local apk_output="${BUILD_DIR}/${app_name}-RVX-Anddea-${version_f}${arch_f}.apk"
 			elif [[ "$table" == *"YouTube-Monet"* ]]; then
-				local apk_output="${BUILD_DIR}/YouTube-OG-Monet-RVX-${version_f}${arch_f}.apk"
+				local apk_output="${BUILD_DIR}/YouTube-OG-Monet-RVX-Anddea-${version_f}${arch_f}.apk"
 			else
-				local apk_output="${BUILD_DIR}/${app_name}-OG-RVX-${version_f}${arch_f}.apk"
+				local apk_output="${BUILD_DIR}/${app_name}-OG-RVX-Anddea-${version_f}${arch_f}.apk"
 			fi
 			mv -f "$patched_apk" "$apk_output"
 			pr "Built ${table} (non-root): '${apk_output}'"
@@ -665,11 +665,11 @@ build_rv() {
 			"$base_template"
 
 		if [[ "$table" == *"YouTube-Music"* ]]; then
-			local module_output="${app_name}-RVX-${version_f}${arch_f}.zip"
+			local module_output="${app_name}-RVX-Anddea-${version_f}${arch_f}.zip"
 		elif [[ "$table" == *"YouTube-Monet"* ]]; then
-			local module_output="YouTube-OG-Monet-RVX-${version_f}${arch_f}.zip"
+			local module_output="YouTube-OG-Monet-RVX-Anddea-${version_f}${arch_f}.zip"
 		else
-			local module_output="${app_name}-OG-RVX-${version_f}${arch_f}.zip"
+			local module_output="${app_name}-OG-RVX-Anddea-${version_f}${arch_f}.zip"
 		fi
 		pr "Packing module ${table}"
 		cp -f "$patched_apk" "${base_template}/base.apk"
@@ -710,24 +710,24 @@ module_prop() {
 	# Handle YouTube Music and YouTube Music Monet cases
 	if [[ "$name" == *"YouTube-Music"* ]]; then
 		if [[ "$name" == *"Monet"* ]]; then
-			id="YouTube-Music-Monet"
-			name="YouTube-Music-Monet"
-			description="YouTube Music RVX Magisk module"
+			id="YouTube-Music-Monet-RVX-Anddea"
+			name="YouTube-Music-Monet-RVX-Anddea"
+			description="YouTube Music RVX Anddea Magisk module"
 		else
-			id="YouTube-Music"
-			name="YouTube-Music"
-			description="YouTube Music RVX Magisk module"
+			id="YouTube-Music-RVX-Anddea"
+			name="YouTube-Music-RVX-Anddea"
+			description="YouTube Music RVX Anddea Magisk module"
 		fi
 	# Handle YouTube cases
 	elif [[ "$name" == *"YouTube"* ]]; then
 		if [[ "$name" == *"Monet"* ]]; then
-			id="YouTube-OG-Monet"
-			name="YouTube-OG-Monet"
-			description="YouTube RVX Magisk module"
+			id="YouTube-OG-Monet-RVX-Anddea"
+			name="YouTube-OG-Monet-RVX-Anddea"
+			description="YouTube RVX Anddea Magisk module"
 		else
-			id="YouTube-OG"
-			name="YouTube-OG"
-			description="YouTube RVX Magisk module"
+			id="YouTube-OG-RVX-Anddea"
+			name="YouTube-OG-RVX-Anddea"
+			description="YouTube RVX Anddea Magisk module"
 		fi
 	fi
 	
