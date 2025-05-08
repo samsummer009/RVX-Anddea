@@ -9,5 +9,5 @@ Install [ReVanced GmsCore](https://github.com/ReVanced/GmsCore/releases/latest) 
 (Optional) Use [zygisk-detach](https://github.com/j-hc/zygisk-detach/releases/latest) to detach root ReVanced YouTube and YouTube Music from the Play Store
   
 CLI: inotia00/revanced-cli-5.0.1-all.jar  
-Patches: anddea/patches-3.8.0-dev.1.rvp  
-[Changelog](https://github.com/anddea/revanced-patches/releases/tag/v3.8.0-dev.1)  
+Patches: anddea/patches-3.8.0-dev.2.rvp  
+[Changelog](https://github.com/anddea/revanced-patches/releases/tag/v3.8.0-dev.2)  
