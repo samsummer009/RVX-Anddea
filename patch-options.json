@@ -29,5 +29,14 @@
         "value": "YouTube RVX"
       }
     ]
+  },
+  {
+    "patchName": "GmsCore support",
+    "options": [
+      {
+        "key": "packageNameYouTube",
+        "value": "com.google.android.youtube.rvx"
+      }
+    ]
   }
 ] 

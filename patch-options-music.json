@@ -13,11 +13,11 @@
     "options": [
       {
         "key": "appNameNotification",
-        "value": "YT Music RVX"
+        "value": "YouTube Music RVX"
       },
       {
         "key": "appNameLauncher",
-        "value": "YT Music RVX"
+        "value": "YouTube Music RVX"
       }
     ]
   },
@@ -31,6 +31,15 @@
       {
         "key": "materialYou",
         "value": true
+      }
+    ]
+  },
+  {
+    "patchName": "GmsCore support",
+    "options": [
+      {
+        "key": "packageNameYouTubeMusic",
+        "value": "com.google.android.app.youtube.music.rvx"
       }
     ]
   }
