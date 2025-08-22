@@ -455,6 +455,100 @@ get_archive_vers() { sed 's/^[^-]*-//;s/-\(all\|arm64-v8a\|arm-v7a\)\.apk//g' <<
 get_archive_pkg_name() { echo "$__ARCHIVE_PKG_NAME__"; }
 # --------------------------------------------------
 
+# Function to try patching with fallback versions
+try_patch_with_fallback() {
+	local stock_apk=$1 patched_apk=$2 patcher_args=$3 rv_cli_jar=$4 rv_patches_jar=$5 pkg_name=$6 dl_from=$7 version=$8 arch=$9
+	local max_attempts=3
+	local attempt=1
+	
+	# Set arch_f based on arch
+	local arch_f=""
+	if [ "$arch" ] && [ "$arch" != "all" ]; then
+		if [ "$arch" = "arm-v7a" ]; then
+			arch_f=".armeabi-v7a"
+		else
+			arch_f=".${arch// /}"
+		fi
+	fi
+	
+	# Get available versions for fallback
+	local available_versions
+	if [ "$dl_from" = "apkmirror" ]; then
+		available_versions=$(get_apkmirror_vers | head -10)
+	elif [ "$dl_from" = "uptodown" ]; then
+		available_versions=$(get_uptodown_vers | head -10)
+	else
+		available_versions=$(get_archive_vers | head -10)
+	fi
+	
+			# Convert to array and sort by version (newest first)
+		local versions_array=()
+		while IFS= read -r ver; do
+			if [ -n "$ver" ]; then
+				versions_array+=("$ver")
+			fi
+		done <<< "$available_versions"
+		
+		# If no versions available, try with current version only
+		if [ ${#versions_array[@]} -eq 0 ]; then
+			versions_array=("$version")
+		fi
+	
+	# Try current version first
+	local current_version="$version"
+	
+	while [ $attempt -le $max_attempts ]; do
+		pr "Attempt $attempt: Trying to patch version '$current_version'"
+		
+		# Download the version if it's different from current
+		if [ "$current_version" != "$version" ]; then
+			local version_f=${current_version// /}
+			version_f=${version_f#v}
+			local new_stock_apk="${TEMP_DIR}/${pkg_name}-${version_f}-${arch_f}.apk"
+			
+			pr "Downloading fallback version '$current_version'"
+			if ! dl_${dl_from} "${args[${dl_from}_dlurl]}" "$current_version" "$new_stock_apk" "$arch" "${args[dpi]}" false; then
+				epr "Failed to download version '$current_version', trying next..."
+				attempt=$((attempt + 1))
+				# Get next version from array
+				if [ $attempt -lt ${#versions_array[@]} ]; then
+					current_version="${versions_array[$attempt]}"
+				else
+					break
+				fi
+				continue
+			fi
+			stock_apk="$new_stock_apk"
+		fi
+		
+		# Try to patch
+		local cmd="env -u GITHUB_REPOSITORY java -jar \"$rv_cli_jar\" patch \"$stock_apk\" --purge -o \"$patched_apk\" -p \"$rv_patches_jar\" --keystore=ks.keystore \
+--keystore-entry-password=123456789 --keystore-password=123456789 --signer=jhc --keystore-entry-alias=jhc $patcher_args"
+		if [ "$OS" = Android ]; then cmd+=" --custom-aapt2-binary=${AAPT2}"; fi
+		
+		pr "$cmd"
+		if eval "$cmd"; then
+			if [ -f "$patched_apk" ]; then
+				pr "Successfully patched version '$current_version' on attempt $attempt"
+				return 0
+			fi
+		fi
+		
+		epr "Failed to patch version '$current_version' on attempt $attempt"
+		attempt=$((attempt + 1))
+		
+		# Get next version from array
+		if [ $attempt -lt ${#versions_array[@]} ]; then
+			current_version="${versions_array[$attempt]}"
+		else
+			break
+		fi
+	done
+	
+	epr "All $max_attempts attempts failed. Could not patch any version."
+	return 1
+}
+
 patch_apk() {
 	local stock_input=$1 patched_apk=$2 patcher_args=$3 rv_cli_jar=$4 rv_patches_jar=$5
 	local cmd="env -u GITHUB_REPOSITORY java -jar \"$rv_cli_jar\" patch \"$stock_input\" --purge -o \"$patched_apk\" -p \"$rv_patches_jar\" --keystore=ks.keystore \
@@ -631,8 +725,8 @@ build_rv() {
 			fi
 		fi
 		if [ "${NORB:-}" != true ] || [ ! -f "$patched_apk" ]; then
-			if ! patch_apk "$stock_apk" "$patched_apk" "${patcher_args[*]}" "${args[cli]}" "${args[ptjar]}"; then
-				epr "Building '${table}' failed!"
+			if ! try_patch_with_fallback "$stock_apk" "$patched_apk" "${patcher_args[*]}" "${args[cli]}" "${args[ptjar]}" "$pkg_name" "$dl_from" "$version" "$arch"; then
+				epr "Building '${table}' failed after trying multiple versions!"
 				return 0
 			fi
 		fi
