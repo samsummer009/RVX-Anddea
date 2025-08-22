@@ -630,6 +630,11 @@ build_rv() {
 		if [ "$version_mode" = beta ]; then __AAV__="true"; else __AAV__="false"; fi
 		pkgvers=$(get_"${dl_from}"_vers)
 		version=$(get_highest_ver <<<"$pkgvers") || version=$(head -1 <<<"$pkgvers")
+		# Ensure we have a valid version number, not "Latest"
+		if [ "$version" = "Latest" ] || [ -z "$version" ]; then
+			epr "Failed to get valid version number, trying first available version"
+			version=$(head -1 <<<"$pkgvers")
+		fi
 	fi
 	if [ -z "$version" ]; then
 		epr "empty version, not building ${table}."
@@ -649,15 +654,49 @@ build_rv() {
 	version_f=${version_f#v}
 	local stock_apk="${TEMP_DIR}/${pkg_name}-${version_f}-${arch_f}.apk"
 		if [ ! -f "$stock_apk" ]; then
+		local download_success=false
 		for dl_p in archive apkmirror uptodown; do
 			if [ -z "${args[${dl_p}_dlurl]}" ]; then continue; fi
 			pr "Downloading '${table}' from ${dl_p}"
 			if ! isoneof $dl_p "${tried_dl[@]}"; then get_${dl_p}_resp "${args[${dl_p}_dlurl]}"; fi
-			if ! dl_${dl_p} "${args[${dl_p}_dlurl]}" "$version" "$stock_apk" "$arch" "${args[dpi]}" "$get_latest_ver"; then
-				epr "ERROR: Could not download '${table}' from ${dl_p} with version '${version}', arch '${arch}', dpi '${args[dpi]}'"
-				continue
+			
+			# Try to download with current version
+			if dl_${dl_p} "${args[${dl_p}_dlurl]}" "$version" "$stock_apk" "$arch" "${args[dpi]}" "$get_latest_ver"; then
+				download_success=true
+				break
 			fi
-			break
+			
+			# If current version fails, try fallback versions
+			epr "Failed to download version '$version', trying fallback versions..."
+			local fallback_versions
+			if [ "$dl_p" = "apkmirror" ]; then
+				fallback_versions=$(get_apkmirror_vers | head -5)
+			elif [ "$dl_p" = "uptodown" ]; then
+				fallback_versions=$(get_uptodown_vers | head -5)
+			else
+				fallback_versions=$(get_archive_vers | head -5)
+			fi
+			
+			local fallback_version
+			while IFS= read -r fallback_version; do
+				if [ -n "$fallback_version" ] && [ "$fallback_version" != "$version" ]; then
+					pr "Trying fallback version: $fallback_version"
+					if dl_${dl_p} "${args[${dl_p}_dlurl]}" "$fallback_version" "$stock_apk" "$arch" "${args[dpi]}" false; then
+						pr "Successfully downloaded fallback version: $fallback_version"
+						version="$fallback_version"
+						version_f=${version// /}
+						version_f=${version_f#v}
+						download_success=true
+						break
+					fi
+				fi
+			done <<< "$fallback_versions"
+			
+			if [ "$download_success" = true ]; then
+				break
+			fi
+			
+			epr "ERROR: Could not download '${table}' from ${dl_p} with any version"
 		done
 		if [ ! -f "$stock_apk" ]; then return 0; fi
 	fi
