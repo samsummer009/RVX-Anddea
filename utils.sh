@@ -629,12 +629,19 @@ build_rv() {
 	if [ $get_latest_ver = true ]; then
 		if [ "$version_mode" = beta ]; then __AAV__="true"; else __AAV__="false"; fi
 		pkgvers=$(get_"${dl_from}"_vers)
+		pr "Available versions: $pkgvers"
 		version=$(get_highest_ver <<<"$pkgvers") || version=$(head -1 <<<"$pkgvers")
 		# Ensure we have a valid version number, not "Latest"
 		if [ "$version" = "Latest" ] || [ -z "$version" ]; then
 			epr "Failed to get valid version number, trying first available version"
-			version=$(head -1 <<<"$pkgvers")
+			# Filter out "Latest" and get the first real version
+			version=$(echo "$pkgvers" | grep -v "Latest" | head -1)
+			if [ -z "$version" ]; then
+				epr "No valid versions found, skipping build"
+				return 0
+			fi
 		fi
+		pr "Selected version: $version"
 	fi
 	if [ -z "$version" ]; then
 		epr "empty version, not building ${table}."
@@ -669,6 +676,8 @@ build_rv() {
 			# If current version fails, try fallback versions
 			epr "Failed to download version '$version', trying fallback versions..."
 			local fallback_versions
+			# Set __AAV__ for fallback version retrieval
+			if [ "$version_mode" = beta ]; then __AAV__="true"; else __AAV__="false"; fi
 			if [ "$dl_p" = "apkmirror" ]; then
 				fallback_versions=$(get_apkmirror_vers | head -5)
 			elif [ "$dl_p" = "uptodown" ]; then
