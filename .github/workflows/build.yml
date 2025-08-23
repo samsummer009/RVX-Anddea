@@ -161,7 +161,7 @@ jobs:
           *By @ytytmrvx*
 
           *🌟 Check out my builder source:*
-          https://github.com/samsummer009/RVX
+          https://github.com/samsummer009/RVX-Anddea
           "
           echo "'$MSG'"
           MSG=${MSG:0:9450}
