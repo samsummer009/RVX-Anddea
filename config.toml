@@ -25,7 +25,7 @@ patcher-args = "--legacy-options=patch-options.json"
 
 # ReVanced Extended
 [YouTube-Monet-RVX]
-enabled = true
+enabled = false
 app-name = "YouTube-Monet"
 apkmirror-dlurl = "https://apkmirror.com/apk/google-inc/youtube/"
 # archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.youtube"
