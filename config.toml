@@ -5,7 +5,7 @@ patches-version = "dev"
 
 # ReVanced Extended
 [YouTube-RVX]
-enabled = true
+enabled = false
 app-name = "YouTube"
 apkmirror-dlurl = "https://apkmirror.com/apk/google-inc/youtube/"
 # archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.youtube"
@@ -45,7 +45,7 @@ patcher-args = "--legacy-options=patch-options.json"
 
 # ReVanced Extended
 [YouTube-Music-RVX]
-enabled = true
+enabled = false
 app-name = "YouTube-Music"
 apkmirror-dlurl = "https://apkmirror.com/apk/google-inc/youtube-music/"
 # archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.apps.youtube.music"
