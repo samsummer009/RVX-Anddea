@@ -5,7 +5,7 @@ patches-version = "dev"
 
 # ReVanced Extended
 [YouTube-RVX]
-enabled = false
+enabled = true
 app-name = "YouTube"
 apkmirror-dlurl = "https://apkmirror.com/apk/google-inc/youtube/"
 # archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.youtube"
@@ -14,9 +14,9 @@ integrations-source = "inotia00/revanced-integrations"
 cli-source = "inotia00/revanced-cli"
 rv-brand = "RVX"
 build-mode = "both"
-#version = "auto"
+version = "auto"
 #version = "latest"
-version = "20.25.35"
+#version = "20.25.35"
 included-patches = "'Visual preferences icons' 'Return YouTube Username' 'Settings for YouTube' 'Theme' 'MaterialYou' 'Custom branding name for YouTube'"
 excluded-patches = "'Custom Shorts action buttons' 'Custom branding icon for YouTube'"
 patcher-args = "--legacy-options=patch-options.json"
@@ -25,7 +25,7 @@ patcher-args = "--legacy-options=patch-options.json"
 
 # ReVanced Extended
 [YouTube-Monet-RVX]
-enabled = false
+enabled = true 
 app-name = "YouTube-Monet"
 apkmirror-dlurl = "https://apkmirror.com/apk/google-inc/youtube/"
 # archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.youtube"
@@ -34,9 +34,9 @@ integrations-source = "inotia00/revanced-integrations"
 cli-source = "inotia00/revanced-cli"
 rv-brand = "RVX"
 build-mode = "both "
-#version = "auto"
+version = "auto"
 #version = "latest"
-version = "20.25.35"
+#version = "20.25.35"
 included-patches = "'Visual preferences icons' 'Return YouTube Username' 'Settings for YouTube' 'MaterialYou' 'Custom branding name for YouTube'"
 excluded-patches = "'Custom Shorts action buttons' 'Custom branding icon for YouTube' 'Theme'"
 patcher-args = "--legacy-options=patch-options.json"
@@ -45,7 +45,7 @@ patcher-args = "--legacy-options=patch-options.json"
 
 # ReVanced Extended
 [YouTube-Music-RVX]
-enabled = false
+enabled = true
 app-name = "YouTube-Music"
 apkmirror-dlurl = "https://apkmirror.com/apk/google-inc/youtube-music/"
 # archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.apps.youtube.music"
@@ -55,9 +55,9 @@ cli-source = "inotia00/revanced-cli"
 rv-brand = "RVX"
 arch = "both"
 build-mode = "both"
-#version = "auto"
+version = "auto"
 #version = "latest"
-version = "8.35.52"
+#version = "8.35.52"
 included-patches = "'Hide player overlay filter' 'Settings for YouTube Music' 'Custom branding name for YouTube Musc'"
 excluded-patches = "'Custom branding icon for YouTube Music' 'Dark theme'"
 patcher-args = "--legacy-options=patch-options-music.json"
