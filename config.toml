@@ -2,6 +2,7 @@ enable-magisk-update = true
 parallel-jobs = 1
 # Use dev patches if they're latest, otherwise fall back to stable
 patches-version = "dev"
+remove-rv-integrations-checks = false
 
 # ReVanced Extended
 [YouTube-RVX]
