@@ -2,11 +2,10 @@ enable-magisk-update = true
 parallel-jobs = 1
 # Use dev patches if they're latest, otherwise fall back to stable
 patches-version = "dev"
-remove-rv-integrations-checks = false
 
 # ReVanced Extended
 [YouTube-RVX]
-enabled = true
+enabled = false
 app-name = "YouTube"
 apkmirror-dlurl = "https://apkmirror.com/apk/google-inc/youtube/"
 # archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.youtube"
@@ -46,7 +45,7 @@ patcher-args = "--legacy-options=patch-options.json"
 
 # ReVanced Extended
 [YouTube-Music-RVX]
-enabled = true
+enabled = false
 app-name = "YouTube-Music"
 apkmirror-dlurl = "https://apkmirror.com/apk/google-inc/youtube-music/"
 # archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.apps.youtube.music"
@@ -54,7 +53,9 @@ patches-source = "anddea/revanced-patches"
 integrations-source = "inotia00/revanced-integrations"
 cli-source = "inotia00/revanced-cli"
 rv-brand = "RVX"
-arch = "both"
+#arch = "arm-v7a"
+arch = "arm64-v8a"
+#arch = "both"
 build-mode = "both"
 version = "auto"
 #version = "latest"
@@ -75,7 +76,9 @@ patches-source = "anddea/revanced-patches"
 integrations-source = "inotia00/revanced-integrations"
 cli-source = "inotia00/revanced-cli"
 rv-brand = "RVX"
-arch = "both"
+#arch = "arm-v7a"
+arch = "arm64-v8a"
+#arch = "both"
 build-mode = "both"
 version = "auto"
 #version = "latest"

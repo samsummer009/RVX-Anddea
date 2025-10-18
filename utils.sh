@@ -109,11 +109,7 @@ get_rv_prebuilts() {
 			if [ "$ver" = "dev" ]; then resp=$(jq -r '.[0]' <<<"$resp"); fi
 			tag_name=$(jq -r '.tag_name' <<<"$resp")
 			asset=$(jq -e -r ".assets[] | select(.name | endswith(\"$ext\"))" <<<"$resp") || return 1
-			if [ -n "$GH_HEADER" ]; then
-				url=$(jq -r .url <<<"$asset")
-			else
-				url=$(jq -r .browser_download_url <<<"$asset")
-			fi
+			url=$(jq -r .url <<<"$asset")
 			name=$(jq -r .name <<<"$asset")
 			file="${dir}/${name}"
 			gh_dl "$file" "$url" >&2 || return 1
@@ -228,21 +224,11 @@ _req() {
 	fi
 }
 req() { _req "$1" "$2" -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:137.0) Gecko/20100101 Firefox/137.0"; }
-gh_req() {
-	if [ -n "$GH_HEADER" ]; then
-		_req "$1" "$2" -H "$GH_HEADER"
-	else
-		_req "$1" "$2"
-	fi
-}
+gh_req() { _req "$1" "$2" -H "$GH_HEADER"; }
 gh_dl() {
 	if [ ! -f "$1" ]; then
 		pr "Getting '$1' from '$2'"
-		if [ -n "$GH_HEADER" ]; then
-			_req "$2" "$1" -H "$GH_HEADER" -H "Accept: application/octet-stream"
-		else
-			_req "$2" "$1"
-		fi
+		_req "$2" "$1" -H "$GH_HEADER" -H "Accept: application/octet-stream"
 	fi
 }
 
@@ -469,99 +455,6 @@ get_archive_vers() { sed 's/^[^-]*-//;s/-\(all\|arm64-v8a\|arm-v7a\)\.apk//g' <<
 get_archive_pkg_name() { echo "$__ARCHIVE_PKG_NAME__"; }
 # --------------------------------------------------
 
-# Function to try patching with fallback versions
-try_patch_with_fallback() {
-	local stock_apk=$1 patched_apk=$2 patcher_args=$3 rv_cli_jar=$4 rv_patches_jar=$5 pkg_name=$6 dl_from=$7 version=$8 arch=$9
-	local max_attempts=3
-	local attempt=1
-	
-	# Set arch_f based on arch
-	local arch_f=""
-	if [ "$arch" ] && [ "$arch" != "all" ]; then
-		if [ "$arch" = "arm-v7a" ]; then
-			arch_f=".armeabi-v7a"
-		else
-			arch_f=".${arch// /}"
-		fi
-	fi
-	
-	# Get available versions for fallback
-	local available_versions
-	if [ "$dl_from" = "apkmirror" ]; then
-		available_versions=$(get_apkmirror_vers | head -10)
-	elif [ "$dl_from" = "uptodown" ]; then
-		available_versions=$(get_uptodown_vers | head -10)
-	else
-		available_versions=$(get_archive_vers | head -10)
-	fi
-	
-			# Convert to array and sort by version (newest first)
-		local versions_array=()
-		while IFS= read -r ver; do
-			if [ -n "$ver" ]; then
-				versions_array+=("$ver")
-			fi
-		done <<< "$available_versions"
-		
-		# If no versions available, try with current version only
-		if [ ${#versions_array[@]} -eq 0 ]; then
-			versions_array=("$version")
-		fi
-	
-	# Try current version first
-	local current_version="$version"
-	
-	while [ $attempt -le $max_attempts ]; do
-		pr "Attempt $attempt: Trying to patch version '$current_version'"
-		
-		# Download the version if it's different from current
-		if [ "$current_version" != "$version" ]; then
-			local version_f=${current_version// /}
-			version_f=${version_f#v}
-			local new_stock_apk="${TEMP_DIR}/${pkg_name}-${version_f}-${arch_f}.apk"
-			
-			pr "Downloading fallback version '$current_version'"
-			if ! dl_${dl_from} "${args[${dl_from}_dlurl]}" "$current_version" "$new_stock_apk" "$arch" "${args[dpi]}" false; then
-				epr "Failed to download version '$current_version', trying next..."
-				attempt=$((attempt + 1))
-				# Get next version from array
-				if [ $attempt -lt ${#versions_array[@]} ]; then
-					current_version="${versions_array[$attempt]}"
-				else
-					break
-				fi
-				continue
-			fi
-			stock_apk="$new_stock_apk"
-		fi
-		
-		# Try to patch
-		local cmd="env -u GITHUB_REPOSITORY java -jar \"$rv_cli_jar\" patch \"$stock_apk\" --purge -o \"$patched_apk\" -p \"$rv_patches_jar\" --keystore=ks.keystore \
---keystore-entry-password=123456789 --keystore-password=123456789 --signer=jhc --keystore-entry-alias=jhc $patcher_args"
-		if [ "$OS" = Android ]; then cmd+=" --custom-aapt2-binary=${AAPT2}"; fi
-		
-		pr "$cmd"
-		if eval "$cmd"; then
-			if [ -f "$patched_apk" ]; then
-				pr "Successfully patched version '$current_version' on attempt $attempt"
-				return 0
-			fi
-		fi
-		
-		epr "Failed to patch version '$current_version' on attempt $attempt"
-		attempt=$((attempt + 1))
-		
-		# Get next version from array
-		if [ $attempt -lt ${#versions_array[@]} ]; then
-			current_version="${versions_array[$attempt]}"
-		else
-			break
-		fi
-	done
-	
-	epr "All $max_attempts attempts failed. Could not patch any version."
-	return 1
-}
 
 patch_apk() {
 	local stock_input=$1 patched_apk=$2 patcher_args=$3 rv_cli_jar=$4 rv_patches_jar=$5
@@ -643,19 +536,7 @@ build_rv() {
 	if [ $get_latest_ver = true ]; then
 		if [ "$version_mode" = beta ]; then __AAV__="true"; else __AAV__="false"; fi
 		pkgvers=$(get_"${dl_from}"_vers)
-		pr "Available versions: $pkgvers"
 		version=$(get_highest_ver <<<"$pkgvers") || version=$(head -1 <<<"$pkgvers")
-		# Ensure we have a valid version number, not "Latest"
-		if [ "$version" = "Latest" ] || [ -z "$version" ]; then
-			epr "Failed to get valid version number, trying first available version"
-			# Filter out "Latest" and get the first real version
-			version=$(echo "$pkgvers" | grep -v "Latest" | head -1)
-			if [ -z "$version" ]; then
-				epr "No valid versions found, skipping build"
-				return 0
-			fi
-		fi
-		pr "Selected version: $version"
 	fi
 	if [ -z "$version" ]; then
 		epr "empty version, not building ${table}."
@@ -674,52 +555,16 @@ build_rv() {
 	local version_f=${version// /}
 	version_f=${version_f#v}
 	local stock_apk="${TEMP_DIR}/${pkg_name}-${version_f}-${arch_f}.apk"
-		if [ ! -f "$stock_apk" ]; then
-		local download_success=false
+	if [ ! -f "$stock_apk" ]; then
 		for dl_p in archive apkmirror uptodown; do
 			if [ -z "${args[${dl_p}_dlurl]}" ]; then continue; fi
 			pr "Downloading '${table}' from ${dl_p}"
 			if ! isoneof $dl_p "${tried_dl[@]}"; then get_${dl_p}_resp "${args[${dl_p}_dlurl]}"; fi
-			
-			# Try to download with current version
-			if dl_${dl_p} "${args[${dl_p}_dlurl]}" "$version" "$stock_apk" "$arch" "${args[dpi]}" "$get_latest_ver"; then
-				download_success=true
-				break
+			if ! dl_${dl_p} "${args[${dl_p}_dlurl]}" "$version" "$stock_apk" "$arch" "${args[dpi]}" "$get_latest_ver"; then
+				epr "ERROR: Could not download '${table}' from ${dl_p} with version '${version}', arch '${arch}', dpi '${args[dpi]}'"
+				continue
 			fi
-			
-			# If current version fails, try fallback versions
-			epr "Failed to download version '$version', trying fallback versions..."
-			local fallback_versions
-			# Set __AAV__ for fallback version retrieval
-			if [ "$version_mode" = beta ]; then __AAV__="true"; else __AAV__="false"; fi
-			if [ "$dl_p" = "apkmirror" ]; then
-				fallback_versions=$(get_apkmirror_vers | head -5)
-			elif [ "$dl_p" = "uptodown" ]; then
-				fallback_versions=$(get_uptodown_vers | head -5)
-			else
-				fallback_versions=$(get_archive_vers | head -5)
-			fi
-			
-			local fallback_version
-			while IFS= read -r fallback_version; do
-				if [ -n "$fallback_version" ] && [ "$fallback_version" != "$version" ]; then
-					pr "Trying fallback version: $fallback_version"
-					if dl_${dl_p} "${args[${dl_p}_dlurl]}" "$fallback_version" "$stock_apk" "$arch" "${args[dpi]}" false; then
-						pr "Successfully downloaded fallback version: $fallback_version"
-						version="$fallback_version"
-						version_f=${version// /}
-						version_f=${version_f#v}
-						download_success=true
-						break
-					fi
-				fi
-			done <<< "$fallback_versions"
-			
-			if [ "$download_success" = true ]; then
-				break
-			fi
-			
-			epr "ERROR: Could not download '${table}' from ${dl_p} with any version"
+			break
 		done
 		if [ ! -f "$stock_apk" ]; then return 0; fi
 	fi
@@ -787,8 +632,8 @@ build_rv() {
 			fi
 		fi
 		if [ "${NORB:-}" != true ] || [ ! -f "$patched_apk" ]; then
-			if ! try_patch_with_fallback "$stock_apk" "$patched_apk" "${patcher_args[*]}" "${args[cli]}" "${args[ptjar]}" "$pkg_name" "$dl_from" "$version" "$arch"; then
-				epr "Building '${table}' failed after trying multiple versions!"
+			if ! patch_apk "$stock_apk" "$patched_apk" "${patcher_args[*]}" "${args[cli]}" "${args[ptjar]}"; then
+				epr "Building '${table}' failed!"
 				return 0
 			fi
 		fi
