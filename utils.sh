@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 MODULE_TEMPLATE_DIR="revanced-magisk"
+CWD=$(pwd)
 TEMP_DIR="temp"
 BIN_DIR="bin"
 BUILD_DIR="build"
@@ -8,10 +9,6 @@ BUILD_DIR="build"
 if [ "${GITHUB_TOKEN-}" ]; then GH_HEADER="Authorization: token ${GITHUB_TOKEN}"; else GH_HEADER=; fi
 NEXT_VER_CODE=${NEXT_VER_CODE:-$(date +'%Y%m%d')}
 OS=$(uname -o)
-CWD=$(pwd)
-
-# Ensure default for __AAV__ to avoid unbound variable errors
-: "${__AAV__:=false}"
 
 toml_prep() {
 	if [ ! -f "$1" ]; then return 1; fi
@@ -27,10 +24,10 @@ toml_get_table() { jq -r -e ".\"${1}\"" <<<"$__TOML__"; }
 toml_get() {
 	local op
 	op=$(jq -r ".\"${2}\" | values" <<<"$1")
-	if [ -n "$op" ]; then
+	if [ "$op" ]; then
 		op="${op#"${op%%[![:space:]]*}"}"
 		op="${op%"${op##*[![:space:]]}"}"
-		op=${op//"'"/"\""}
+		op=${op//"'"/'"'}
 		echo "$op"
 	else return 1; fi
 }
