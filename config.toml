@@ -2,6 +2,7 @@ enable-magisk-update = true
 parallel-jobs = 1
 # Use dev patches if they're latest, otherwise fall back to stable
 patches-version = "dev"
+remove-rv-integrations-checks = false
 
 # ReVanced Extended
 [YouTube-RVX]
@@ -33,7 +34,7 @@ patches-source = "anddea/revanced-patches"
 integrations-source = "inotia00/revanced-integrations"
 cli-source = "inotia00/revanced-cli"
 rv-brand = "RVX"
-build-mode = "both "
+build-mode = "both"
 version = "auto"
 #version = "latest"
 #version = "20.25.35"
@@ -75,7 +76,7 @@ integrations-source = "inotia00/revanced-integrations"
 cli-source = "inotia00/revanced-cli"
 rv-brand = "RVX"
 arch = "both"
-build-mode = "both "
+build-mode = "both"
 version = "auto"
 #version = "latest"
 #version = "8.35.52"
