@@ -109,7 +109,11 @@ get_rv_prebuilts() {
 			if [ "$ver" = "dev" ]; then resp=$(jq -r '.[0]' <<<"$resp"); fi
 			tag_name=$(jq -r '.tag_name' <<<"$resp")
 			asset=$(jq -e -r ".assets[] | select(.name | endswith(\"$ext\"))" <<<"$resp") || return 1
-			url=$(jq -r .url <<<"$asset")
+			if [ -n "$GH_HEADER" ]; then
+				url=$(jq -r .url <<<"$asset")
+			else
+				url=$(jq -r .browser_download_url <<<"$asset")
+			fi
 			name=$(jq -r .name <<<"$asset")
 			file="${dir}/${name}"
 			gh_dl "$file" "$url" >&2 || return 1
@@ -224,11 +228,21 @@ _req() {
 	fi
 }
 req() { _req "$1" "$2" -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:137.0) Gecko/20100101 Firefox/137.0"; }
-gh_req() { _req "$1" "$2" -H "$GH_HEADER"; }
+gh_req() {
+	if [ -n "$GH_HEADER" ]; then
+		_req "$1" "$2" -H "$GH_HEADER"
+	else
+		_req "$1" "$2"
+	fi
+}
 gh_dl() {
 	if [ ! -f "$1" ]; then
 		pr "Getting '$1' from '$2'"
-		_req "$2" "$1" -H "$GH_HEADER" -H "Accept: application/octet-stream"
+		if [ -n "$GH_HEADER" ]; then
+			_req "$2" "$1" -H "$GH_HEADER" -H "Accept: application/octet-stream"
+		else
+			_req "$2" "$1"
+		fi
 	fi
 }
 
