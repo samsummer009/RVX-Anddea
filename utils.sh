@@ -283,7 +283,7 @@ isoneof() {
 
 patches_list_versions() {
 	local cli_jar=$1 patches_jar=$2 pkg_name=$3 op
-	if ! op=$(java -jar "$cli_jar" list-versions -f "$pkg_name" "$patches_jar" 2>&1); then
+	if ! op=$(java -jar "$cli_jar" list-versions -f "$pkg_name" --patches="$patches_jar" 2>&1); then
 		epr "Could not list versions $cli_jar: '$op'"
 		return 1
 	fi
@@ -291,7 +291,7 @@ patches_list_versions() {
 }
 patches_list() {
 	local cli_jar=$1 patches_jar=$2 pkg_name=$3 op
-	if ! op=$(java -jar "$cli_jar" list-patches -f "$pkg_name" -d -i -o -p -u -v "$patches_jar" 2>&1); then
+	if ! op=$(java -jar "$cli_jar" list-patches -f "$pkg_name" -d -i -o -p -u -v --patches="$patches_jar" 2>&1); then
 		epr "Could not get patches list $cli_jar: '$op'"
 		return 1
 	fi
