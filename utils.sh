@@ -270,7 +270,7 @@ get_patch_last_supported_ver() {
 	fi
 	# Morphe CLI returns patch info with versions, extract versions from the output
 	if [[ "$op" == *"Usage: morphe-cli list-patches"* ]]; then
-		# CLI help was shown, return empty
+		# CLI help was shown, return empty to use latest version
 		return
 	fi
 	if [ -z "$op" ] || [ "$op" = "Any" ]; then return; fi
@@ -278,9 +278,8 @@ get_patch_last_supported_ver() {
 	vers=$(echo "$op" | grep -oE '\b[0-9]+\.[0-9]+\.[0-9]+\b' | sort -rV | head -1)
 	if [ -n "$vers" ]; then
 		echo "$vers"
-	else
-		return 1
 	fi
+	# If no version found, return empty to use latest available version
 }
 
 isoneof() {
