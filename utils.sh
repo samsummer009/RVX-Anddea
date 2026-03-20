@@ -264,18 +264,23 @@ get_patch_last_supported_ver() {
 			return
 		fi
 	fi
-	if ! op=$(java -jar "$cli_jar" list-versions -f "$pkg_name" "$patches_jar" 2>&1); then
-		epr "list-versions: '$op'"
+	if ! op=$(java -jar "$cli_jar" list-patches -f "$pkg_name" -v "$patches_jar" 2>&1); then
+		epr "list-patches: '$op'"
 		return 1
 	fi
-	# Morphe CLI returns a list of versions directly
-	if [[ "$op" == *"List the most common compatible versions"* ]]; then
+	# Morphe CLI returns patch info with versions, extract versions from the output
+	if [[ "$op" == *"Usage: morphe-cli list-patches"* ]]; then
 		# CLI help was shown, return empty
 		return
 	fi
 	if [ -z "$op" ] || [ "$op" = "Any" ]; then return; fi
-	# Get the highest version from the list
-	get_highest_ver <<<"$op" || return 1
+	# Extract versions from the patch list output
+	vers=$(echo "$op" | grep -oE '\b[0-9]+\.[0-9]+\.[0-9]+\b' | sort -rV | head -1)
+	if [ -n "$vers" ]; then
+		echo "$vers"
+	else
+		return 1
+	fi
 }
 
 isoneof() {
@@ -287,8 +292,8 @@ isoneof() {
 
 patches_list_versions() {
 	local cli_jar=$1 patches_jar=$2 pkg_name=$3 op
-	if ! op=$(java -jar "$cli_jar" list-versions -f "$pkg_name" "$patches_jar" 2>&1); then
-		epr "Could not list versions $cli_jar: '$op'"
+	if ! op=$(java -jar "$cli_jar" list-patches -f "$pkg_name" -v "$patches_jar" 2>&1); then
+		epr "Could not list patches $cli_jar: '$op'"
 		return 1
 	fi
 	echo "$op"
