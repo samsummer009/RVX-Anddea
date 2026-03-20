@@ -264,14 +264,18 @@ get_patch_last_supported_ver() {
 			return
 		fi
 	fi
-	if ! op=$(java -jar "$cli_jar" list-versions --patches="$patches_jar" -f "$pkg_name" 2>&1 | tail -n +3 | awk '{$1=$1}1'); then
+	if ! op=$(java -jar "$cli_jar" list-versions --patches="$patches_jar" -f "$pkg_name" 2>&1); then
 		epr "list-versions: '$op'"
 		return 1
 	fi
-	if [ "$op" = "Any" ]; then return; fi
-	pcount=$(head -1 <<<"$op") pcount=${pcount#*(} pcount=${pcount% *}
-	if [ -z "$pcount" ]; then abort "unreachable: '$pcount'"; fi
-	grep -F "($pcount patch" <<<"$op" | sed 's/ (.* patch.*//' | get_highest_ver || return 1
+	# Morphe CLI returns a list of versions directly
+	if [[ "$op" == *"List the most common compatible versions"* ]]; then
+		# CLI help was shown, return empty
+		return
+	fi
+	if [ -z "$op" ] || [ "$op" = "Any" ]; then return; fi
+	# Get the highest version from the list
+	get_highest_ver <<<"$op" || return 1
 }
 
 isoneof() {
