@@ -1,6 +1,6 @@
 [
   {
-    "key": "Settings for YouTube Music",
+    "patchName": "Settings for YouTube Music",
     "options": [
       {
         "key": "rvxSettingsLabel",
@@ -9,7 +9,7 @@
     ]
   },
   {
-    "key": "Custom branding name for YouTube Music",
+    "patchName": "Custom branding name for YouTube Music",
     "options": [
       {
         "key": "appNameNotification",
@@ -22,7 +22,7 @@
     ]
   },
   {
-    "key": "Dark theme",
+    "patchName": "Dark theme",
     "options": [
       {
         "key": "darkThemeBackgroundColor",
@@ -35,7 +35,7 @@
     ]
   },
   {
-    "key": "GmsCore support",
+    "patchName": "GmsCore support",
     "options": [
       {
         "key": "packageNameYouTubeMusic",
