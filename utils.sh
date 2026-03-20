@@ -264,7 +264,7 @@ get_patch_last_supported_ver() {
 			return
 		fi
 	fi
-	if ! op=$(java -jar "$cli_jar" list-versions --patches="$patches_jar" -f "$pkg_name" 2>&1); then
+	if ! op=$(java -jar "$cli_jar" list-versions -f "$pkg_name" "$patches_jar" 2>&1); then
 		epr "list-versions: '$op'"
 		return 1
 	fi
@@ -287,7 +287,7 @@ isoneof() {
 
 patches_list_versions() {
 	local cli_jar=$1 patches_jar=$2 pkg_name=$3 op
-	if ! op=$(java -jar "$cli_jar" list-versions --patches="$patches_jar" -f "$pkg_name" 2>&1); then
+	if ! op=$(java -jar "$cli_jar" list-versions -f "$pkg_name" "$patches_jar" 2>&1); then
 		epr "Could not list versions $cli_jar: '$op'"
 		return 1
 	fi
