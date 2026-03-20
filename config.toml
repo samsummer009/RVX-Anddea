@@ -2,6 +2,7 @@ enable-magisk-update = true
 parallel-jobs = 1
 # Use dev patches if they're latest, otherwise fall back to stable
 patches-version = "dev"
+cli-version = "dev"
 
 # ReVanced Extended
 [YouTube-RVX]

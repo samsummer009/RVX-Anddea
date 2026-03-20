@@ -56,7 +56,7 @@ get_rv_prebuilts() {
 			ext="jar"
 			local grab_cl=false
 		elif [ "$tag" = "Patches" ]; then
-			ext="rvp"
+			if [ "$ver" = "dev" ]; then ext="mpp"; else ext="rvp"; fi
 			local grab_cl=true
 		else abort unreachable; fi
 		local dir=${src%/*}
@@ -109,7 +109,7 @@ get_rv_prebuilts() {
 			if [ "$ver" = "dev" ]; then resp=$(jq -r '.[0]' <<<"$resp"); fi
 			tag_name=$(jq -r '.tag_name' <<<"$resp")
 			asset=$(jq -e -r ".assets[] | select(.name | endswith(\"$ext\"))" <<<"$resp") || return 1
-			url=$(jq -r .url <<<"$asset")
+			url=$(jq -r .browser_download_url <<<"$asset")
 			name=$(jq -r .name <<<"$asset")
 			file="${dir}/${name}"
 			gh_dl "$file" "$url" >&2 || return 1
