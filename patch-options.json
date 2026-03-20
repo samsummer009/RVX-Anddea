@@ -1,6 +1,6 @@
 [
   {
-    "patchName": "Settings for YouTube",
+    "key": "Settings for YouTube",
     "options": [
       {
         "key": "insertPosition",
@@ -13,7 +13,7 @@
     ]
   },
   {
-    "patchName": "Theme",
+    "key": "Theme",
     "options": [
       {
         "key": "darkThemeBackgroundColor",
@@ -22,7 +22,7 @@
     ]
   },
   {
-    "patchName": "Custom branding name for YouTube",
+    "key": "Custom branding name for YouTube",
     "options": [
       {
         "key": "appName",
@@ -31,7 +31,7 @@
     ]
   },
   {
-    "patchName": "GmsCore support",
+    "key": "GmsCore support",
     "options": [
       {
         "key": "packageNameYouTube",

@@ -22,7 +22,7 @@ version = "auto"
 #version = "20.23.40"
 included-patches = "'Visual preferences icons' 'Return YouTube Username' 'Settings for YouTube' 'Theme' 'MaterialYou' 'Custom branding name for YouTube'"
 excluded-patches = "'Custom Shorts action buttons' 'Custom branding icon for YouTube'"
-patcher-args = ""
+patcher-args = "--options-file=patch-options.json"
 
 
 
@@ -43,7 +43,7 @@ version = "auto"
 #version = "20.23.40"
 included-patches = "'Visual preferences icons' 'Return YouTube Username' 'Settings for YouTube' 'MaterialYou' 'Custom branding name for YouTube'"
 excluded-patches = "'Custom Shorts action buttons' 'Custom branding icon for YouTube' 'Theme'"
-patcher-args = ""
+patcher-args = "--options-file=patch-options.json"
 
 
 
@@ -67,7 +67,7 @@ version = "auto"
 #version = "8.33.53"
 included-patches = "'Hide player overlay filter' 'Settings for YouTube Music' 'Custom branding name for YouTube Musc'"
 excluded-patches = "'Custom branding icon for YouTube Music' 'Dark theme'"
-patcher-args = "--legacy-options=patch-options-music.json"
+patcher-args = "--options-file=patch-options-music.json"
 
 
 
@@ -91,4 +91,4 @@ version = "auto"
 #version = "8.33.53"
 included-patches = "'Hide player overlay filter' 'Settings for YouTube Music' 'Dark theme' 'Custom branding name for YouTube Music'"
 excluded-patches = "'Custom branding icon for YouTube Music'"
-patcher-args = "--legacy-options=patch-options-music.json"
+patcher-args = "--options-file=patch-options-music.json"
