@@ -264,7 +264,7 @@ get_patch_last_supported_ver() {
 			return
 		fi
 	fi
-	if ! op=$(java -jar "$rv_cli_jar" list-versions "$rv_patches_jar" -f "$pkg_name" 2>&1 | tail -n +3 | awk '{$1=$1}1'); then
+	if ! op=$(java -jar "$cli_jar" list-versions --patches="$patches_jar" -f "$pkg_name" 2>&1 | tail -n +3 | awk '{$1=$1}1'); then
 		epr "list-versions: '$op'"
 		return 1
 	fi
@@ -474,8 +474,8 @@ get_archive_pkg_name() { echo "$__ARCHIVE_PKG_NAME__"; }
 
 
 patch_apk() {
-	local stock_input=$1 patched_apk=$2 patcher_args=$3 rv_cli_jar=$4 rv_patches_jar=$5
-	local cmd="env -u GITHUB_REPOSITORY java -jar \"$rv_cli_jar\" patch \"$stock_input\" --purge -o \"$patched_apk\" -p \"$rv_patches_jar\" --keystore=ks.keystore \
+	local stock_input=$1 patched_apk=$2 patcher_args=$3 cli_jar=$4 patches_jar=$5
+	local cmd="env -u GITHUB_REPOSITORY java -jar \"$cli_jar\" patch \"$stock_input\" --purge -o \"$patched_apk\" -p=\"$patches_jar\" --keystore=ks.keystore \
 --keystore-entry-password=123456789 --keystore-password=123456789 --signer=jhc --keystore-entry-alias=jhc $patcher_args"
 	if [ "$OS" = Android ]; then cmd+=" --custom-aapt2-binary=${AAPT2}"; fi
 	pr "$cmd"
