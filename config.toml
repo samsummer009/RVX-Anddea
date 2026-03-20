@@ -1,4 +1,4 @@
-enable-magisk-update = true
+enable-module-update = true
 parallel-jobs = 1
 remove-rv-integrations-checks = false
 # Use dev patches if they're latest, otherwise fall back to stable

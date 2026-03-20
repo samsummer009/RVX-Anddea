@@ -42,7 +42,7 @@ abort() {
 	exit 1
 }
 
-get_rv_prebuilts() {
+get_prebuilts() {
 	local cli_src=$1 cli_ver=$2 patches_src=$3 patches_ver=$4
 	pr "Getting prebuilts (${patches_src%/*})" >&2
 	local cl_dir=${patches_src%/*}
@@ -757,5 +757,5 @@ versionCode=${version_code}
 author=SamSummer
 description=${description}" >"${base_template}/module.prop"
 
-	if [ "$ENABLE_MAGISK_UPDATE" = true ]; then echo "updateJson=${updateJson}" >>"${base_template}/module.prop"; fi
+	if [ "$ENABLE_MODULE_UPDATE" = true ]; then echo "updateJson=${updateJson}" >>"${base_template}/module.prop"; fi
 }
