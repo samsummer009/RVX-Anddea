@@ -9,8 +9,8 @@ cli-version = "dev"
 [YouTube-RVX]
 enabled = true
 app-name = "YouTube"
-apkmirror-dlurl = "https://apkmirror.com/apk/google-inc/youtube/"
-# archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.youtube"
+apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube/"
+archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.youtube"
 patches-source = "anddea/revanced-patches"
 integrations-source = "inotia00/revanced-integrations"
 cli-source = "inotia00/revanced-cli"
@@ -29,8 +29,8 @@ patcher-args = "--legacy-options=patch-options.json"
 [YouTube-Monet-RVX]
 enabled = true 
 app-name = "YouTube-Monet"
-apkmirror-dlurl = "https://apkmirror.com/apk/google-inc/youtube/"
-# archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.youtube"
+apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube/"
+archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.youtube"
 patches-source = "anddea/revanced-patches"
 integrations-source = "inotia00/revanced-integrations"
 cli-source = "inotia00/revanced-cli"
@@ -49,8 +49,8 @@ patcher-args = "--legacy-options=patch-options.json"
 [YouTube-Music-RVX]
 enabled = true
 app-name = "YouTube-Music"
-apkmirror-dlurl = "https://apkmirror.com/apk/google-inc/youtube-music/"
-# archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.apps.youtube.music"
+apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube-music/"
+archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.apps.youtube.music"
 patches-source = "anddea/revanced-patches"
 integrations-source = "inotia00/revanced-integrations"
 cli-source = "inotia00/revanced-cli"
@@ -72,8 +72,8 @@ patcher-args = "--legacy-options=patch-options-music.json"
 [YouTube-Music-Monet-RVX]
 enabled = true
 app-name = "YouTube-Music-Monet"
-apkmirror-dlurl = "https://apkmirror.com/apk/google-inc/youtube-music/"
-# archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.apps.youtube.music"
+apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube-music/"
+archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.apps.youtube.music"
 patches-source = "anddea/revanced-patches"
 integrations-source = "inotia00/revanced-integrations"
 cli-source = "inotia00/revanced-cli"
