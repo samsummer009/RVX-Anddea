@@ -97,7 +97,6 @@ for table_name in $(toml_get_table_names); do
 	echo "DEBUG: build_mode for table $table_name: $build_mode"
 done
 
-declare -A app_args
 idx=0
 for table_name in $(toml_get_table_names); do
 	if [ -z "$table_name" ]; then continue; fi
