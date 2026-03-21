@@ -43,6 +43,7 @@ if [ "$ENABLE_MODULE_UPDATE" = true ] && [ -z "${GITHUB_REPOSITORY-}" ]; then
 fi
 echo "DEBUG: Script starting with arguments: $@"
 echo "DEBUG: COMPRESSION_LEVEL=$COMPRESSION_LEVEL"
+echo "DEBUG: About to check COMPRESSION_LEVEL: '$COMPRESSION_LEVEL'"
 if ((COMPRESSION_LEVEL > 9)) || ((COMPRESSION_LEVEL < 0)); then abort "compression-level must be within 0-9"; fi
 
 jq --version >/dev/null || abort "\`jq\` is not installed. install it with 'apt install jq' or equivalent"
