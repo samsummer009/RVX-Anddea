@@ -140,6 +140,8 @@ for table_name in $(toml_get_table_names); do
 		module_prop_name_b=${app_args[module_prop_name]}
 		app_args[module_prop_name]="${module_prop_name_b}-arm64"
 		idx=$((idx + 1))
+		echo "DEBUG: About to call build_rv with app_args"
+		declare -p app_args  # Debug: Show what arguments are being passed
 		build_rv "$(declare -p app_args)" &
 		app_args[table]="$table_name (arm-v7a)"
 		app_args[arch]="arm-v7a"
