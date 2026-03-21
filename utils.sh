@@ -474,8 +474,15 @@ dl_archive() {
 }
 get_archive_resp() {
 	local r
+	pr "DEBUG: Getting archive response from $1"
 	r=$(req "$1" -)
-	if [ -z "$r" ]; then return 1; else __ARCHIVE_RESP__=$(sed -n 's;^<a href="\(.*\)"[^"]*;\1;p' <<<"$r"); fi
+	if [ -z "$r" ]; then 
+		pr "DEBUG: Archive response is empty"
+		return 1
+	else 
+		__ARCHIVE_RESP__=$(sed -n 's;^<a href="\(.*\)"[^"]*;\1;p' <<<"$r")
+		pr "DEBUG: Archive response parsed, first few lines: $(echo "$__ARCHIVE_RESP__" | head -3)"
+	fi
 	__ARCHIVE_PKG_NAME__=$(awk -F/ '{print $NF}' <<<"$1")
 }
 get_archive_vers() { sed 's/^[^-]*-//;s/-\(all\|arm64-v8a\|arm-v7a\)\.apk//g' <<<"$__ARCHIVE_RESP__"; }
