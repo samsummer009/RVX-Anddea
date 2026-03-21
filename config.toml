@@ -7,7 +7,7 @@ cli-version = "dev"
 
 # ReVanced Extended
 [YouTube-RVX]
-enabled = true
+enabled = false
 app-name = "YouTube"
 apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube"
 uptodown-dlurl = "https://youtube.en.uptodown.com/android"
@@ -28,7 +28,7 @@ patcher-args = ""
 
 # ReVanced Extended
 [YouTube-Monet-RVX]
-enabled = true 
+enabled = false 
 app-name = "YouTube-Monet"
 apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube"
 uptodown-dlurl = "https://youtube.en.uptodown.com/android"
