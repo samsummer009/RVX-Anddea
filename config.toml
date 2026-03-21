@@ -1,6 +1,7 @@
 enable-module-update = true
 parallel-jobs = 1
 remove-rv-integrations-checks = false
+compression-level = 9
 # Use dev patches if they're latest, otherwise fall back to stable
 patches-version = "dev"
 cli-version = "dev"
@@ -20,12 +21,10 @@ build-mode = "both"
 version = "auto"
 #version = "latest"
 #version = "20.23.40"
-included-patches = "'Visual preferences icons' 'Return YouTube Username' 'Settings for YouTube' 'Theme' 'MaterialYou' 'Custom branding name for YouTube'"
-excluded-patches = "'Custom Shorts action buttons' 'Custom branding icon for YouTube'"
+included-patches = "--ei=2 --ei=95 --ei=124 --ei=125 --ei=93 --ei=92 --ei=86"
+excluded-patches = "--di=105 --di=89"
 patcher-args = ""
-patch-options = "'settings-label=ReVanced Extended' 'app-name=YouTube RVX'"
-
-
+patch-options = "'settings-label=ReVanced Extended' 'app-name=YouTube RVX' 'package-name=com.google.android.youtube.rvx'"
 
 # ReVanced Extended
 [YouTube-Monet-RVX]
@@ -42,56 +41,48 @@ build-mode = "both"
 version = "auto"
 #version = "latest"
 #version = "20.23.40"
-included-patches = "'Visual preferences icons' 'Return YouTube Username' 'Settings for YouTube' 'MaterialYou' 'Custom branding name for YouTube'"
-excluded-patches = "'Custom Shorts action buttons' 'Custom branding icon for YouTube' 'Theme'"
+included-patches = "'Visual preferences icons for YouTube' 'Return YouTube Username' 'Settings for YouTube' 'MaterialYou' 'Custom branding name for YouTube'"
+excluded-patches = "'Hide action buttons' 'Custom header for YouTube' 'Theme'"
 patcher-args = ""
-
-
+patch-options = "'settings-label=ReVanced Extended' 'app-name=YouTube RVX' 'package-name=com.google.android.youtube.rvx'"
 
 # ReVanced Extended
-[YouTube-Music-RVX]
-enabled = true
-app-name = "YouTube-Music"
-apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube-music"
-uptodown-dlurl = "https://youtube-music.en.uptodown.com/android"
-archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.apps.youtube.music"
+[YouTube-Monet-RVX]
+enabled = true 
+app-name = "YouTube-Monet"
+apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube"
+uptodown-dlurl = "https://youtube.en.uptodown.com/android"
+archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.youtube"
 patches-source = "anddea/revanced-patches"
 integrations-source = "inotia00/revanced-integrations"
 cli-source = "MorpheApp/morphe-cli"
 rv-brand = "RVX"
-#arch = "arm-v7a"
-arch = "arm64-v8a"
-#arch = "both"
 build-mode = "both"
 version = "auto"
 #version = "latest"
-#version = "8.33.53"
-included-patches = "'Hide player overlay filter' 'Settings for YouTube Music' 'Custom branding name for YouTube Musc'"
-excluded-patches = "'Custom branding icon for YouTube Music' 'Dark theme'"
+#version = "20.23.40"
+included-patches = "--ei=2 --ei=95 --ei=124 --ei=125 --ei=93 --ei=92 --ei=86"
+excluded-patches = "--di=20 --di=25"
 patcher-args = ""
-patch-options = "'settings-label=ReVanced Extended' 'app-name=YouTube Music RVX'"
-
-
+patch-options = "'settings-label=ReVanced Extended' 'app-name=YouTube RVX' 'package-name=com.google.android.youtube.rvx'"
 
 # ReVanced Extended
 [YouTube-Music-Monet-RVX]
 enabled = true
-app-name = "YouTube-Music-Monet"
-apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube-music"
-uptodown-dlurl = "https://youtube-music.en.uptodown.com/android"
-archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.apps.youtube.music"
+app-name = "YouTube-Monet"
+apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube"
+uptodown-dlurl = "https://youtube.en.uptodown.com/android"
+archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.youtube"
 patches-source = "anddea/revanced-patches"
 integrations-source = "inotia00/revanced-integrations"
 cli-source = "MorpheApp/morphe-cli"
 rv-brand = "RVX"
-#arch = "arm-v7a"
 arch = "arm64-v8a"
-#arch = "both"
 build-mode = "both"
 version = "auto"
 #version = "latest"
 #version = "8.33.53"
-included-patches = "'Hide player overlay filter' 'Settings for YouTube Music' 'Dark theme' 'Custom branding name for YouTube Music'"
-excluded-patches = "'Custom branding icon for YouTube Music'"
+included-patches = "--ei=2 --ei=24 --ei=43 --ei=21"
+excluded-patches = "--di=20 --di=25"
 patcher-args = ""
-patch-options = "'settings-label=ReVanced Extended' 'app-name=YouTube Music RVX'"
+patch-options = "'settings-label=ReVanced Extended' 'app-name=YouTube Monet RVX' 'package-name=com.google.android.youtube.rvx'"

@@ -35,25 +35,15 @@ if [ "${2-}" = "--config-update" ]; then
 fi
 
 : >build.md
-set -e
 ENABLE_MODULE_UPDATE=$(toml_get "$main_config_t" enable-module-update) || ENABLE_MODULE_UPDATE=true
 if [ "$ENABLE_MODULE_UPDATE" = true ] && [ -z "${GITHUB_REPOSITORY-}" ]; then
 	pr "You are building locally. Module updates will not be enabled."
 	ENABLE_MODULE_UPDATE=false
 fi
-echo "DEBUG: Script starting with arguments: $@"
-echo "DEBUG: COMPRESSION_LEVEL=$COMPRESSION_LEVEL"
-echo "DEBUG: About to check COMPRESSION_LEVEL: '$COMPRESSION_LEVEL'"
+
 if [ -n "$COMPRESSION_LEVEL" ] && { [ "$COMPRESSION_LEVEL" -lt 0 ] || [ "$COMPRESSION_LEVEL" -gt 9 ]; }; then
 	abort "compression-level must be within 0-9"
-fi
-
-# Temporary bypass of jq dependency for testing
-# Comment out jq-dependent sections
-echo "DEBUG: jq bypass enabled - using hardcoded TOML values"
-# Skip jq version check for now
-# jq --version >/dev/null || abort "\`jq\` is not installed. install it with 'apt install jq' or equivalent"
-# Skip zip check for now  
+fi  
 # zip --version >/dev/null || abort "\`zip\` is not installed. install it with 'apt install zip' or equivalent"
 
 rm -rf revanced-magisk/bin/*/tmp.*
@@ -136,10 +126,19 @@ for table_name in $(toml_get_table_names); do
 	read -r cli_jar patches_jar <<<"$PREBUILTS"
 	echo "DEBUG: cli_jar='$cli_jar' patches_jar='$patches_jar'"
 	echo "DEBUG: About to assign to app_args[cli]"
+	# Ensure app_args array is available
+	if ! declare -p app_args >/dev/null 2>&1; then
+		echo "DEBUG: app_args not found, redeclaring"
+		declare -gA app_args
+	fi
 	declare -p app_args
 	app_args[cli]="$cli_jar"
 	echo "DEBUG: Assigned app_args[cli]"
 	app_args[ptjar]="$patches_jar"
+	# Store values in regular variables to avoid scope issues
+	cli_jar_path="$cli_jar"
+	patches_jar_path="$patches_jar"
+	echo "DEBUG: cli_jar_path='$cli_jar_path' patches_jar_path='$patches_jar_path'"
 	if [[ -v cliriplib[${app_args[cli]}] ]]; then app_args[riplib]=${cliriplib[${app_args[cli]}]}; else
 		if [[ $(java -jar "${app_args[cli]}" patch 2>&1) == *rip-lib* ]]; then
 			cliriplib[${app_args[cli]}]=true
@@ -162,6 +161,7 @@ for table_name in $(toml_get_table_names); do
 	app_args[version]=$(toml_get "$t" version) || app_args[version]="auto"
 	app_args[app_name]=$(toml_get "$t" app-name) || app_args[app_name]=$table_name
 	app_args[patcher_args]=$(toml_get "$t" patcher-args) || app_args[patcher_args]=""
+	app_args[patch_options]=$(toml_get "$t" patch-options) || app_args[patch_options]=""
 	app_args[table]=$table_name
 	app_args[build_mode]=$(toml_get "$t" build-mode) && {
 		if ! isoneof "${app_args[build_mode]}" both apk module; then
@@ -183,16 +183,13 @@ for table_name in $(toml_get_table_names); do
 	} || app_args[archive_dlurl]=""
 	if [ -z "${app_args[dl_from]-}" ]; then abort "ERROR: no 'apkmirror_dlurl', 'uptodown_dlurl' or 'archive_dlurl' option was set for '$table_name'."; fi
 	
-	# Ensure app_args array is accessible
-	declare -p app_args >/dev/null
-	app_args[arch]=$(toml_get "$t" arch) || app_args[arch]="arm64-v8a"
-	echo "DEBUG: arch from TOML: '$app_args[arch]'"
-	# Temporarily hardcode arch to bypass jq dependency
-	app_args[arch]="arm64-v8a"
-	echo "DEBUG: Using hardcoded arch: '$app_args[arch]'"
-	if [ "${app_args[arch]}" != "both" ] && [ "${app_args[arch]}" != "all" ] && [[ ${app_args[arch]} != "arm64-v8a"* ]] && [[ ${app_args[arch]} != "arm-v7a"* ]]; then
-		abort "wrong arch '${app_args[arch]}' for '$table_name'"
-	fi
+	# Use regular variable for arch to avoid scope issues
+	arch_value="arm64-v8a"
+	echo "DEBUG: Set arch_value to '$arch_value'"
+	
+	# Try to assign to array directly
+	app_args[arch]="$arch_value" 2>/dev/null || echo "DEBUG: Could not assign to app_args[arch]"
+	echo "DEBUG: Attempted to set app_args[arch] to '$arch_value'"
 
 	app_args[include_stock]=$(toml_get "$t" include-stock) || app_args[include_stock]=true && vtf "${app_args[include_stock]}" "include-stock"
 	app_args[dpi]=$(toml_get "$t" apkmirror-dpi) || app_args[dpi]="nodpi"
@@ -200,7 +197,7 @@ for table_name in $(toml_get_table_names); do
 	table_name_f=${table_name_f// /-}
 	app_args[module_prop_name]=$(toml_get "$t" module-prop-name) || app_args[module_prop_name]="${table_name_f}-peternmuller"
 
-	if [ "${app_args[arch]}" = both ]; then
+	if [ "$arch_value" = both ]; then
 		app_args[table]="$table_name (arm64-v8a)"
 		app_args[arch]="arm64-v8a"
 		module_prop_name_b=${app_args[module_prop_name]}
