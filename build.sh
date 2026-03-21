@@ -77,15 +77,8 @@ for table_name in $(toml_get_table_names); do
 	echo "DEBUG: Finished processing table $table_name"
 done
 echo "DEBUG: All tables processed, about to validate build_mode"
-for table_name in $(toml_get_table_names); do
-	t=$(toml_get_table "$table_name")
-	enabled=$(toml_get "$t" enabled) || enabled=true
-	echo "DEBUG: Final check for table $table_name: enabled='$enabled'"
-	if [ "$enabled" = false ]; then 
-		echo "DEBUG: Table $table_name is disabled"
-	fi
-done
 
+# Validate build_mode after TOML parsing
 echo "DEBUG: About to check build_mode validation"
 for table_name in $(toml_get_table_names); do
 	t=$(toml_get_table "$table_name")
