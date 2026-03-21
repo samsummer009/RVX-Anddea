@@ -467,8 +467,9 @@ get_uptodown_pkg_name() { $HTMLQ --text "tr.full:nth-child(1) > td:nth-child(3)"
 dl_archive() {
 	local url=$1 version=$2 output=$3 arch=$4
 	local path version=${version// /}
-	pr "DEBUG: Looking for pattern '${version_f#v}-${arch// /}' in archive response"
-	path=$(grep "${version_f#v}-${arch// /}" <<<"$__ARCHIVE_RESP__") || return 1
+	local version_f=${version#v}
+	pr "DEBUG: Looking for pattern '${version_f}-${arch// /}' in archive response"
+	path=$(grep "${version_f}-${arch// /}" <<<"$__ARCHIVE_RESP__") || return 1
 	pr "DEBUG: Found path '${path}'"
 	req "${url}/${path}" "$output"
 }
