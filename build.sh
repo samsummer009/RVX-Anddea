@@ -120,6 +120,15 @@ for table_name in $(toml_get_table_names); do
 	patches_ver=$(toml_get "$t" patches-version) || patches_ver=$DEF_PATCHES_VER
 	cli_src=$(toml_get "$t" cli-source) || cli_src=$DEF_CLI_SRC
 	cli_ver=$(toml_get "$t" cli-version) || cli_ver=$DEF_CLI_VER
+	
+	echo "DEBUG: patches_src='$patches_src' patches_ver='$patches_ver' cli_src='$cli_src' cli_ver='$cli_ver'"
+	
+	# Temporarily hardcode values to bypass jq dependency
+	patches_src="anddea/revanced-patches"
+	patches_ver="dev"
+	cli_src="MorpheApp/morphe-cli"
+	cli_ver="dev"
+	echo "DEBUG: Using hardcoded values: patches_src='$patches_src' patches_ver='$patches_ver' cli_src='$cli_src' cli_ver='$cli_ver'"
 
 	if ! PREBUILTS="$(get_prebuilts "$cli_src" "$cli_ver" "$patches_src" "$patches_ver")"; then
 		abort "could not download prebuilts"
