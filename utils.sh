@@ -512,6 +512,25 @@ check_sig() {
 	fi
 }
 
+toml_get() {
+	local op quote_placeholder=$'\001'
+	op=$(jq -r ".\"${2}\" | values" <<<"$1")
+	if [ "$op" ]; then
+		return
+	fi
+}
+
+# Custom function to handle multi-line values properly
+toml_get_array() {
+	local table_name=$1
+	local op quote_placeholder=$'\001'
+	op=$(jq -r ".\"${table_name}\" | values" <<<"$__TOML__")
+	if [ "$op" ]; then
+		return
+	fi
+}
+
+# Modified build_rv to handle patch_options as array
 build_rv() {
 	eval "declare -A args=${1#*=}"
 	local version="" pkg_name=""
@@ -537,8 +556,9 @@ build_rv() {
 	[ "${args[exclusive_patches]}" = true ] && p_patcher_args+=("--exclusive")
 	# Add custom patch options if specified
 	if [ "${args[patch_options]}" ]; then
-		# Parse space-separated options properly
-		for option in ${args[patch_options]}; do
+		# Convert patch_options to array and add each option
+		eval "local patch_opts_array=(${args[patch_options]})"
+		for option in "${patch_opts_array[@]}"; do
 			p_patcher_args+=("-O${option}")
 		done
 	fi
