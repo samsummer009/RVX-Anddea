@@ -598,7 +598,7 @@ build_rv() {
 			if ! dl_${dl_p} "${args[${dl_p}_dlurl]}" "$version" "$stock_apk" "$arch" "${args[dpi]}" "$get_latest_ver"; then
 				epr "ERROR: Could not download '${table}' from ${dl_p} with version '${version}', arch '${arch}', dpi '${args[dpi]}'"
 				# If this is archive and version doesn't exist, try latest version
-				if [ "$dl_p" = "archive" ] && [ "$get_latest_ver" = false ]; then
+				if [ "$dl_p" = "archive" ]; then
 					pr "Falling back to latest version from ${dl_p}"
 					pkgvers=$(get_"${dl_p}"_vers)
 					version=$(get_highest_ver <<<"$pkgvers") || version=$(head -1 <<<"$pkgvers")
