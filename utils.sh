@@ -511,10 +511,11 @@ toml_get() {
 	local op quote_placeholder=$'\001'
 	op=$(jq -r ".\"${2}\" | values" <<<"$1")
 	if [ "$op" ]; then
+		# If key doesn't exist, jq returns empty, so return the default
+		echo "false"
 		return
 	fi
-	# If the key doesn't exist, jq returns empty, so return the default
-	echo "${op:-false}"
+	echo "$op"
 }
 
 # Custom function to handle multi-line values properly
