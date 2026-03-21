@@ -23,6 +23,7 @@ version = "auto"
 included-patches = "'Visual preferences icons' 'Return YouTube Username' 'Settings for YouTube' 'Theme' 'MaterialYou' 'Custom branding name for YouTube'"
 excluded-patches = "'Custom Shorts action buttons' 'Custom branding icon for YouTube'"
 patcher-args = ""
+patch-options = "'settings-label=ReVanced Extended' 'app-name=YouTube RVX'"
 
 
 
@@ -68,6 +69,7 @@ version = "auto"
 included-patches = "'Hide player overlay filter' 'Settings for YouTube Music' 'Custom branding name for YouTube Musc'"
 excluded-patches = "'Custom branding icon for YouTube Music' 'Dark theme'"
 patcher-args = ""
+patch-options = "'settings-label=ReVanced Extended' 'app-name=YouTube Music RVX'"
 
 
 
@@ -92,3 +94,4 @@ version = "auto"
 included-patches = "'Hide player overlay filter' 'Settings for YouTube Music' 'Dark theme' 'Custom branding name for YouTube Music'"
 excluded-patches = "'Custom branding icon for YouTube Music'"
 patcher-args = ""
+patch-options = "'settings-label=ReVanced Extended' 'app-name=YouTube Music RVX'"

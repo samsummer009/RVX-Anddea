@@ -535,6 +535,12 @@ build_rv() {
 	if [ "${args[excluded_patches]}" ]; then p_patcher_args+=("$(join_args "${args[excluded_patches]}" -d)"); fi
 	if [ "${args[included_patches]}" ]; then p_patcher_args+=("$(join_args "${args[included_patches]}" -e)"); fi
 	[ "${args[exclusive_patches]}" = true ] && p_patcher_args+=("--exclusive")
+	# Add custom patch options if specified
+	if [ "${args[patch_options]}" ]; then
+		for option in ${args[patch_options]}; do
+			p_patcher_args+=("-O${option}")
+		done
+	fi
 
 	local tried_dl=()
 	for dl_p in uptodown apkmirror archive; do
