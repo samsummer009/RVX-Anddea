@@ -166,7 +166,6 @@ for table_name in $(toml_get_table_names); do
 	} || app_args[build_mode]=apk
 	app_args[uptodown_dlurl]=$(toml_get "$t" uptodown-dlurl) && {
 		app_args[uptodown_dlurl]=${app_args[uptodown_dlurl]%/}
-		app_args[uptodown_dlurl]=${app_args[uptodown_dlurl]%download}
 		app_args[uptodown_dlurl]=${app_args[uptodown_dlurl]%/}
 		app_args[dl_from]=uptodown
 	} || app_args[uptodown_dlurl]=""
@@ -179,6 +178,9 @@ for table_name in $(toml_get_table_names); do
 		app_args[dl_from]=archive
 	} || app_args[archive_dlurl]=""
 	if [ -z "${app_args[dl_from]-}" ]; then abort "ERROR: no 'apkmirror_dlurl', 'uptodown_dlurl' or 'archive_dlurl' option was set for '$table_name'."; fi
+	
+	# Ensure app_args array is accessible
+	declare -p app_args >/dev/null
 	app_args[arch]=$(toml_get "$t" arch) || app_args[arch]="arm64-v8a"
 	echo "DEBUG: arch from TOML: '$app_args[arch]'"
 	# Temporarily hardcode arch to bypass jq dependency
