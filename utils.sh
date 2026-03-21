@@ -537,6 +537,7 @@ build_rv() {
 	[ "${args[exclusive_patches]}" = true ] && p_patcher_args+=("--exclusive")
 	# Add custom patch options if specified
 	if [ "${args[patch_options]}" ]; then
+		# Parse space-separated options properly
 		for option in ${args[patch_options]}; do
 			p_patcher_args+=("-O${option}")
 		done
