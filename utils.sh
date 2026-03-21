@@ -464,7 +464,11 @@ dl_archive() {
 	local path version=${version// /}
 	local version_f=${version#v}
 	pr "DEBUG: Looking for pattern '${version_f}-${arch// /}' in archive response"
-	path=$(grep "${version_f}-${arch// /}" <<<"$__ARCHIVE_RESP__") || return 1
+	path=$(grep "${version_f}-${arch// /}" <<<"$__ARCHIVE_RESP__")
+	if [ -z "$path" ]; then
+		pr "DEBUG: Architecture-specific file not found, falling back to all.apk"
+		path=$(grep "${version_f}-all" <<<"$__ARCHIVE_RESP__") || return 1
+	fi
 	pr "DEBUG: Found path '${path}'"
 	req "${url}/${path}" "$output"
 }
