@@ -44,7 +44,7 @@ fi
 echo "DEBUG: Script starting with arguments: $@"
 echo "DEBUG: COMPRESSION_LEVEL=$COMPRESSION_LEVEL"
 echo "DEBUG: About to check COMPRESSION_LEVEL: '$COMPRESSION_LEVEL'"
-if [ "$COMPRESSION_LEVEL" = "" ] || { [ "$COMPRESSION_LEVEL" -lt 0 ] || [ "$COMPRESSION_LEVEL" -gt 9 ]; }; then
+if [ -n "$COMPRESSION_LEVEL" ] && { [ "$COMPRESSION_LEVEL" -lt 0 ] || [ "$COMPRESSION_LEVEL" -gt 9 ]; }; then
 	abort "compression-level must be within 0-9"
 fi
 
