@@ -135,7 +135,10 @@ for table_name in $(toml_get_table_names); do
 	echo "DEBUG: PREBUILTS='$PREBUILTS'"
 	read -r cli_jar patches_jar <<<"$PREBUILTS"
 	echo "DEBUG: cli_jar='$cli_jar' patches_jar='$patches_jar'"
+	echo "DEBUG: About to assign to app_args[cli]"
+	declare -p app_args
 	app_args[cli]="$cli_jar"
+	echo "DEBUG: Assigned app_args[cli]"
 	app_args[ptjar]="$patches_jar"
 	if [[ -v cliriplib[${app_args[cli]}] ]]; then app_args[riplib]=${cliriplib[${app_args[cli]}]}; else
 		if [[ $(java -jar "${app_args[cli]}" patch 2>&1) == *rip-lib* ]]; then
