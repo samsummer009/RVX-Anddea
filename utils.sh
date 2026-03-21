@@ -518,6 +518,8 @@ toml_get() {
 	if [ "$op" ]; then
 		return
 	fi
+	# If the key doesn't exist, jq returns empty, so return the default
+	echo "${op:-false}"
 }
 
 # Custom function to handle multi-line values properly
