@@ -66,8 +66,46 @@ for table_name in $(toml_get_table_names); do
 	t=$(toml_get_table "$table_name")
 	echo "DEBUG: Processing table $table_name"
 	enabled=$(toml_get "$t" enabled) || enabled=true
-	echo "DEBUG: enabled='$enabled'"
-	vtf "$enabled" "enabled"
+	echo "DEBUG: enabled='$enabled' (raw: $enabled)"
+	echo "DEBUG: enabled length: ${#enabled}"
+	echo "DEBUG: enabled test: [ \"$enabled\" = false ]"
+	if [ "$enabled" = false ]; then 
+		echo "DEBUG: Skipping disabled table $table_name"
+		continue
+	fi
+	echo "DEBUG: Finished processing table $table_name"
+done
+echo "DEBUG: All tables processed, about to validate build_mode"
+for table_name in $(toml_get_table_names); do
+	t=$(toml_get_table "$table_name")
+	enabled=$(toml_get "$t" enabled) || enabled=true
+	echo "DEBUG: Final check for table $table_name: enabled='$enabled'"
+	if [ "$enabled" = false ]; then 
+		echo "DEBUG: Table $table_name is disabled"
+	fi
+done
+
+echo "DEBUG: About to check build_mode validation"
+for table_name in $(toml_get_table_names); do
+	t=$(toml_get_table "$table_name")
+	build_mode=$(toml_get "$t" build-mode) && {
+		if ! isoneof "${build_mode}" both apk module; then
+			abort "ERROR: build-mode '${build_mode}' is not a valid option for '${table_name}': only 'both', 'apk' or 'module' is allowed"
+		fi
+	} || build_mode=apk
+	echo "DEBUG: build_mode for table $table_name: $build_mode"
+done
+
+declare -A app_args
+idx=0
+for table_name in $(toml_get_table_names); do
+	if [ -z "$table_name" ]; then continue; fi
+	t=$(toml_get_table "$table_name")
+	echo "DEBUG: Processing table $table_name"
+	enabled=$(toml_get "$t" enabled) || enabled=true
+	echo "DEBUG: enabled='$enabled' (raw: $enabled)"
+	echo "DEBUG: enabled length: ${#enabled}"
+	echo "DEBUG: enabled test: [ \"$enabled\" = false ]"
 	if [ "$enabled" = false ]; then 
 		echo "DEBUG: Skipping disabled table $table_name"
 		continue
@@ -77,7 +115,6 @@ for table_name in $(toml_get_table_names); do
 		idx=$((idx - 1))
 	fi
 
-	declare -A app_args
 	patches_src=$(toml_get "$t" patches-source) || patches_src=$DEF_PATCHES_SRC
 	patches_ver=$(toml_get "$t" patches-version) || patches_ver=$DEF_PATCHES_VER
 	cli_src=$(toml_get "$t" cli-source) || cli_src=$DEF_CLI_SRC
