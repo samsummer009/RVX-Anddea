@@ -506,15 +506,15 @@ check_sig() {
 		grep -qFx "$sig $pkg_name" sig.txt
 	fi
 }
-
 toml_get() {
 	local op quote_placeholder=$'\001'
 	op=$(jq -r ".\"${2}\" | values" <<<"$1")
-	if [ "$op" ]; then
-		# If key doesn't exist, jq returns empty, so return the default
+	if [ -z "$op" ]; then
+		# If key doesn't exist, jq returns empty, so return default
 		echo "false"
 		return
 	fi
+	# Key exists, return the actual value
 	echo "$op"
 }
 
