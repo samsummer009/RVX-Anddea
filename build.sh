@@ -62,9 +62,14 @@ idx=0
 for table_name in $(toml_get_table_names); do
 	if [ -z "$table_name" ]; then continue; fi
 	t=$(toml_get_table "$table_name")
+	echo "DEBUG: Processing table $table_name"
 	enabled=$(toml_get "$t" enabled) || enabled=true
+	echo "DEBUG: enabled='$enabled'"
 	vtf "$enabled" "enabled"
-	if [ "$enabled" = false ]; then continue; fi
+	if [ "$enabled" = false ]; then 
+		echo "DEBUG: Skipping disabled table $table_name"
+		continue
+	fi
 	if ((idx >= PARALLEL_JOBS)); then
 		wait -n
 		idx=$((idx - 1))
