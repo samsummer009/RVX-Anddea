@@ -174,7 +174,7 @@ config_update() {
 			elif [ "$PATCHES_VER" = "latest" ]; then
 				last_patches=$(gh_req "$rv_rel/latest" -)
 			else
-				last_patches=$(gh_req "$rv_rel/tags/${ver}" -)
+				last_patches=$(gh_req "$rv_rel/tags/${PATCHES_VER}" -)
 			fi
 			if ! last_patches=$(jq -e -r '.assets[] | select(.name | endswith("rvp") or endswith("mpp")) | .name' <<<"$last_patches"); then
 				abort oops
