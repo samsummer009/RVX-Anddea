@@ -663,7 +663,7 @@ build_rv() {
 	log "${table}: ${version}"
 
 	local microg_patch
-	microg_patch=$(grep "^Name: " <<<"$list_patches" | grep -i "gmscore\|microg" || :) microg_patch=${microg_patch#*: }
+	microg_patch=$(grep "^Name: " <<<"$list_patches" | grep -i "gmscore\|microg\|GmsCore Support" || :) microg_patch=${microg_patch#*: }
 	if [ -n "$microg_patch" ] && [[ ${p_patcher_args[*]} =~ $microg_patch ]]; then
 		epr "You cant include/exclude microg patch as that's done by rvmm builder automatically."
 		p_patcher_args=("${p_patcher_args[@]//-[ei] ${microg_patch}/}")
@@ -696,8 +696,16 @@ build_rv() {
 		if [ -n "$microg_patch" ]; then
 			if [ "$build_mode" = apk ]; then
 				patcher_args+=("-e \"${microg_patch}\"")
+				pr "Adding microG patch for APK build: ${microg_patch}"
 			elif [ "$build_mode" = module ]; then
 				patcher_args+=("-d \"${microg_patch}\"")
+				pr "Removing microG patch for module build: ${microg_patch}"
+			fi
+		else
+			# If no microG patch found, try to force it for APK builds
+			if [ "$build_mode" = apk ]; then
+				pr "Warning: No microG patch detected, attempting to add GmsCore Support"
+				patcher_args+=("-e \"GmsCore Support\"")
 			fi
 		fi
 		# Handle branding based on build mode
