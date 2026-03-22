@@ -26,6 +26,7 @@ included-patches = "--ei=2 --ei=95 --ei=124 --ei=125 --ei=93 --ei=92 --ei=86"
 excluded-patches = "--di=105 --di=89"
 patcher-args = ""
 patch-options = "'settings-label=ReVanced Extended' 'app-name=YouTube RVX' 'package-name=com.google.android.youtube.rvx'"
+include-stock = true
 
 # ReVanced Extended
 [YouTube-Monet-RVX]
@@ -47,6 +48,7 @@ included-patches = "--ei=2 --ei=95 --ei=124 --ei=125 --ei=93 --ei=92 --ei=86"
 excluded-patches = "--di=105 --di=89"
 patcher-args = ""
 patch-options = "'settings-label=ReVanced Extended' 'app-name=YouTube RVX' 'package-name=com.google.android.youtube.rvx'"
+include-stock = true
 
 # ReVanced Extended
 [YouTube-Music-RVX]
@@ -68,6 +70,7 @@ included-patches = "--ei=2 --ei=24 --ei=43 --ei=21 --ei=25"
 excluded-patches = "--di=20"
 patcher-args = ""
 patch-options = "'settings-label=ReVanced Extended' 'app-name=YouTube Music RVX' 'package-name=com.google.android.apps.youtube.music.rvx'"
+include-stock = true
 
 # ReVanced Extended
 [YouTube-Music-Monet-RVX]
@@ -89,3 +92,4 @@ included-patches = "--ei=2 --ei=24 --ei=43 --ei=21 --ei=25"
 excluded-patches = "--di=20"
 patcher-args = ""
 patch-options = "'settings-label=ReVanced Extended' 'app-name=YouTube Music Monet RVX' 'package-name=com.google.android.apps.youtube.music.rvx'"
+include-stock = true
