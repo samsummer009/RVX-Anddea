@@ -51,7 +51,7 @@ patch-options = "'settings-label=ReVanced Extended' 'app-name=YouTube RVX' 'pack
 # ReVanced Extended
 [YouTube-Music-RVX]
 enabled = true
-app-name = "YouTube Music RVX"
+app-name = "YouTube Music"
 apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube-music"
 uptodown-dlurl = "https://youtube-music.en.uptodown.com/android"
 archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.apps.youtube.music"
@@ -72,7 +72,7 @@ patch-options = "'settings-label=ReVanced Extended' 'app-name=YouTube Music RVX'
 # ReVanced Extended
 [YouTube-Music-Monet-RVX]
 enabled = true
-app-name = "YouTube Music RVX"
+app-name = "YouTube Music Monet"
 apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube-music"
 uptodown-dlurl = "https://youtube-music.en.uptodown.com/android"
 archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.apps.youtube.music"
@@ -88,4 +88,4 @@ version = "auto"
 included-patches = "--ei=2 --ei=24 --ei=43 --ei=21 --ei=25"
 excluded-patches = "--di=20"
 patcher-args = ""
-patch-options = "'settings-label=ReVanced Extended' 'app-name=YouTube Music RVX' 'package-name=com.google.android.apps.youtube.music.rvx'"
+patch-options = "'settings-label=ReVanced Extended' 'app-name=YouTube Music Monet RVX' 'package-name=com.google.android.apps.youtube.music.rvx'"
