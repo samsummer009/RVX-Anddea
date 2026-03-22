@@ -565,11 +565,12 @@ build_rv() {
 	[ "${args[exclusive_patches]}" = true ] && p_patcher_args+=("--exclusive")
 	# Add custom patch options if specified
 	if [ "${args[patch_options]}" ]; then
-		# Convert patch_options to array and add each option
-		eval "local patch_opts_array=(${args[patch_options]})"
-		for option in "${patch_opts_array[@]}"; do
-			p_patcher_args+=("-O${option}")
-		done
+		# Parse patch options properly handling quoted strings
+		while IFS= read -r option; do
+			if [ -n "$option" ]; then
+				p_patcher_args+=("-O${option}")
+			fi
+		done <<< "$(list_args "${args[patch_options]}")"
 	fi
 
 	local tried_dl=()
