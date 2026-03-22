@@ -551,7 +551,7 @@ build_rv() {
 	local dl_from=${args[dl_from]}
 	local arch=${args[arch]}
 	local arch_f=""
-	if [ "$arch" ] && [ "$arch" != "all" ]; then
+	if [ "$arch" ] && [ "$arch" != "all" ] && [ "$arch" != "false" ]; then
 		if [ "$arch" = "arm-v7a" ]; then
 			arch_f=".armeabi-v7a"
 		else
