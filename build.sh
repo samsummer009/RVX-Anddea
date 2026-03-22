@@ -184,7 +184,10 @@ for table_name in $(toml_get_table_names); do
 	if [ -z "${app_args[dl_from]-}" ]; then abort "ERROR: no 'apkmirror_dlurl', 'uptodown_dlurl' or 'archive_dlurl' option was set for '$table_name'."; fi
 	
 	# Use regular variable for arch to avoid scope issues
-	arch_value="arm64-v8a"
+	arch_value=$(toml_get "$t" arch) || arch_value=""
+	if [ -z "$arch_value" ]; then
+		arch_value="universal"
+	fi
 	echo "DEBUG: Set arch_value to '$arch_value'"
 	
 	# Try to assign to array directly

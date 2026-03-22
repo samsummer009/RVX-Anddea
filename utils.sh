@@ -772,7 +772,15 @@ build_rv() {
 }
 
 list_args() { tr -d '\t\r' <<<"$1" | tr -s ' ' | sed 's/" "/"\n"/g' | sed 's/\([^"]\)"\([^"]\)/\1'\''\2/g' | grep -v '^$' || :; }
-join_args() { list_args "$1" | sed "s/^/${2} /" | paste -sd " " - || :; }
+join_args() { 
+	local args="$1" prefix="$2"
+	# Don't add prefix if args already contain --di or --ei flags
+	if [[ "$args" == *"--di"* ]] || [[ "$args" == *"--ei"* ]]; then
+		list_args "$1" | paste -sd " " - || :
+	else
+		list_args "$1" | sed "s/^/${prefix} /" | paste -sd " " - || :
+	fi
+}
 
 module_config() {
 	local ma=""
