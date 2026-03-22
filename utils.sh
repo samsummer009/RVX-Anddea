@@ -728,15 +728,42 @@ build_rv() {
 		fi
 		if [ "$build_mode" = apk ]; then
 			if [[ "$table" == *"YouTube-Music"* ]]; then
-				local apk_output="${BUILD_DIR}/${app_name}-RVX-Anddea-${version_f}${arch_f}.apk"
+				local apk_output="${BUILD_DIR}/YouTube-Music-RVX-Anddea-${version_f}${arch_f}.apk"
 			elif [[ "$table" == *"YouTube-Monet"* ]]; then
-				local apk_output="${BUILD_DIR}/YouTube-OG-Monet-RVX-Anddea-${version_f}${arch_f}.apk"
+				local apk_output="${BUILD_DIR}/YouTube-Monet-RVX-Anddea-${version_f}${arch_f}.apk"
 			else
-				local apk_output="${BUILD_DIR}/${app_name}-OG-RVX-Anddea-${version_f}${arch_f}.apk"
+				local apk_output="${BUILD_DIR}/YouTube-RVX-Anddea-${version_f}${arch_f}.apk"
 			fi
 			mv -f "$patched_apk" "$apk_output"
 			pr "Built ${table} (non-root): '${apk_output}'"
 			continue
+		fi
+		# For modules, create patched APK with original package name
+		if [ "$build_mode" = module ]; then
+			# Create a version with original package name for modules
+			local original_pkg_name=""
+			if [[ "$table" == *"YouTube-Music"* ]]; then
+				original_pkg_name="com.google.android.apps.youtube.music"
+			elif [[ "$table" == *"YouTube"* ]]; then
+				original_pkg_name="com.google.android.youtube"
+			fi
+			if [ -n "$original_pkg_name" ]; then
+				# Create new patcher args with original package name
+				local module_patcher_args=("${patcher_args[@]}")
+				# Replace package name in patcher args
+				for i in "${!module_patcher_args[@]}"; do
+					if [[ "${module_patcher_args[i]}" == *"package-name="* ]]; then
+						module_patcher_args[i]="${module_patcher_args[i]//.rvx/}"
+					fi
+				done
+				# Create module-specific patched APK with original package name
+				local module_patched_apk="${TEMP_DIR}/${original_pkg_name}-${version_f}-module.apk"
+				if ! patch_apk "$stock_apk" "$module_patched_apk" "${module_patcher_args[*]}" "${args[cli]}" "${args[ptjar]}"; then
+					epr "Failed to create module version for ${table}"
+				else
+					patched_apk="$module_patched_apk"
+				fi
+			fi
 		fi
 		local base_template
 		base_template=$(mktemp -d -p "$TEMP_DIR")
