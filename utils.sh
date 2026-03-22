@@ -565,12 +565,16 @@ build_rv() {
 	[ "${args[exclusive_patches]}" = true ] && p_patcher_args+=("--exclusive")
 	# Add custom patch options if specified
 	if [ "${args[patch_options]}" ]; then
-		# Parse patch options properly handling quoted strings
-		while IFS= read -r option; do
+		# Parse patch options properly handling single quotes
+		local options_string="${args[patch_options]}"
+		# Remove surrounding quotes and split by single quotes
+		options_string=$(echo "$options_string" | sed "s/^'//" | sed "s/'$//")
+		# Split by single quote space pattern
+		echo "$options_string" | sed "s/' '/\n/g" | while IFS= read -r option; do
 			if [ -n "$option" ]; then
 				p_patcher_args+=("-O${option}")
 			fi
-		done <<< "$(list_args "${args[patch_options]}")"
+		done
 	fi
 
 	local tried_dl=()
