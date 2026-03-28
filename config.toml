@@ -9,7 +9,7 @@ cli-version = "latest"
 [YouTube-RVX]
 enabled = true
 app-name = "YouTube"
-apkmirror-dlurl = "https://apkmirror.com/apk/google-inc/youtube/"
+apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube"
 uptodown-dlurl = "https://youtube.en.uptodown.com/android"
 archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.youtube"
 patches-source = "anddea/revanced-patches"
@@ -30,7 +30,7 @@ patcher-args = "--options-file=patch-options.json"
 [YouTube-Monet-RVX]
 enabled = true 
 app-name = "YouTube-Monet"
-apkmirror-dlurl = "https://apkmirror.com/apk/google-inc/youtube/"
+apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube"
 uptodown-dlurl = "https://youtube.en.uptodown.com/android"
 archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.youtube"
 patches-source = "anddea/revanced-patches"
@@ -51,7 +51,7 @@ patcher-args = "--options-file=patch-options.json"
 [YouTube-Music-RVX]
 enabled = true
 app-name = "YouTube-Music"
-apkmirror-dlurl = "https://apkmirror.com/apk/google-inc/youtube-music/"
+apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube-music"
 uptodown-dlurl = "https://youtube-music.en.uptodown.com/android"
 archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.apps.youtube.music"
 patches-source = "anddea/revanced-patches"
@@ -75,7 +75,7 @@ patcher-args = "--options-file=patch-options-music.json"
 [YouTube-Music-Monet-RVX]
 enabled = true
 app-name = "YouTube-Music-Monet"
-apkmirror-dlurl = "https://apkmirror.com/apk/google-inc/youtube-music/"
+apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube-music"
 uptodown-dlurl = "https://youtube-music.en.uptodown.com/android"
 archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.apps.youtube.music"
 patches-source = "anddea/revanced-patches"
