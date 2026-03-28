@@ -297,14 +297,17 @@ patches_list_versions() {
 }
 patches_list() {
 	local cli_jar=$1 patches_jar=$2 pkg_name=$3 op
-	# Try revanced-cli syntax first (patches file as positional argument)
-	if ! op=$(java -jar "$cli_jar" list-patches "$patches_jar" --filter-package-name "$pkg_name" --with-versions --with-packages 2>&1); then
-		# Fallback to morphe-cli syntax
-		if ! op=$(java -jar "$cli_jar" list-patches -p "$patches_jar" --filter-package-name "$pkg_name" --versions --packages -b 2>&1); then
-			# Another fallback for older revanced-cli
-			if ! op=$(java -jar "$cli_jar" list-patches --patches "$patches_jar" -f "$pkg_name" --with-versions --with-packages 2>&1); then
-				epr "Could not get patches list $cli_jar: '$op'"
-				return 1
+	# Try revanced-cli syntax with equals sign for filter
+	if ! op=$(java -jar "$cli_jar" list-patches "$patches_jar" --filter-package-name="$pkg_name" --with-versions --with-packages 2>&1); then
+		# Try with -f flag
+		if ! op=$(java -jar "$cli_jar" list-patches "$patches_jar" -f "$pkg_name" -v -p 2>&1); then
+			# Fallback to morphe-cli syntax
+			if ! op=$(java -jar "$cli_jar" list-patches -p "$patches_jar" --filter-package-name "$pkg_name" --versions --packages -b 2>&1); then
+				# Another fallback for older revanced-cli
+				if ! op=$(java -jar "$cli_jar" list-patches --patches "$patches_jar" -f "$pkg_name" --with-versions --with-packages 2>&1); then
+					epr "Could not get patches list $cli_jar: '$op'"
+					return 1
+				fi
 			fi
 		fi
 	fi
